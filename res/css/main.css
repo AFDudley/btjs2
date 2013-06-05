@@ -1,0 +1,69 @@
+    /* =====================================================================================================================
+     *  Binary tactics: Initialization
+     * ================================================================================================================== */
+
+
+/* Overriding default values
+ * ---------------------------------------------------------------------------------------------------------------------- */
+
+* { margin: 0px; padding: 0px; }
+
+
+/*      Elements animations
+// =========================================================================================================== */
+
+    /* DOM manipulation animations: Slide in/out */
+    .slide-enter {
+        position: relative;
+        -webkit-transition: all linear 0.5s;
+        -moz-transition: all linear 0.5s;
+        -ms-transition: all linear 0.5s;
+        -o-transition: all linear 0.5s;
+        transition: all linear 0.5s;
+    }
+    .slide-leave {
+        position: relative;
+        -webkit-transition: all linear 0.25s;
+        -moz-transition: all linear 0.25s;
+        -ms-transition: all linear 0.25s;
+        -o-transition: all linear 0.25s;
+        transition: all linear 0.25s;
+    }    
+    .slide-enter {
+        left: -200%;
+    }
+    .slide-enter-active {
+        left: 0px;
+    }
+    .slide-leave {
+        left: 0px;
+    }
+    .slide-leave-active {
+        left: 100%;
+    }
+
+
+/* Generic
+ * ---------------------------------------------------------------------------------------------------------------------- */
+
+BODY {
+    width: 100%;
+    overflow-x: hidden;
+    
+    background: #444444;
+}
+
+/* TEMP
+ * ---------------------------------------------------------------------------------------------------------------------- */
+
+div.section {
+    padding: 20px;
+    margin: 10px;
+    
+    border: 1px solid #000000;
+    background-color: #eeeeee;
+    
+    font-family: monospace;
+    font-size: 11px;
+    color: c6ff00;
+}

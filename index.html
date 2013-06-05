@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html ng-app="bt">
+    <head>
+        <title>Binary Tactics</title>
+        
+        <link rel="stylesheet"href="res/css/main.css" type="text/css" media="all" />     
+    </head>
+    
+    <body ng-controller="bt.ng.controller">
+
+        <!-- Includes current view -->
+        <div class="section">
+            Select view:
+            <select ng-model="bt.navigation.nextView" ng-change=" bt.navigation.selectView() " ng-options="v.name for v in bt.config.views"></select>
+        </div>
+        
+        <div ng-include src=" bt.navigation.selectedView.url " ng-animate=" 'slide' "></div>
+
+        <!-- 3rd party: JS inclusions -->
+        <script type="text/javascript" src="res/js/3rd_party/angular.115.js"></script>
+        <!-- No needed yet: <script type="text/javascript" src="res/js/3rd_party/jquery.202.js"></script> -->
+        <!-- BT: JS inclusions -->
+        <script type="text/javascript" src="res/js/bt_init.js"></script>
+        <script type="text/javascript" src="res/js/bt_config.js"></script>
+    </body>
+</html>
