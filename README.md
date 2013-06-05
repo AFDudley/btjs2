@@ -1,0 +1,1 @@
+Binary Tactics: Client-Side implementation #2
