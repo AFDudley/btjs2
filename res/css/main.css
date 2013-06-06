@@ -13,7 +13,7 @@
 // =========================================================================================================== */
 
     /* DOM manipulation animations: Slide in/out */
-    .slide-enter {
+    .slideL-enter {
         position: relative;
         -webkit-transition: all linear 0.5s;
         -moz-transition: all linear 0.5s;
@@ -21,7 +21,7 @@
         -o-transition: all linear 0.5s;
         transition: all linear 0.5s;
     }
-    .slide-leave {
+    .slideL-leave {
         position: relative;
         -webkit-transition: all linear 0.25s;
         -moz-transition: all linear 0.25s;
@@ -29,16 +29,45 @@
         -o-transition: all linear 0.25s;
         transition: all linear 0.25s;
     }    
-    .slide-enter {
+    .slideL-enter {
+        right: -200%;
+    }
+    .slideL-enter-active {
+        right: 0px;
+    }
+    .slideL-leave {
+        right: 0px;
+    }
+    .slideL-leave-active {
+        right: 100%;
+    }
+
+    .slideR-enter {
+        position: relative;
+        -webkit-transition: all linear 0.5s;
+        -moz-transition: all linear 0.5s;
+        -ms-transition: all linear 0.5s;
+        -o-transition: all linear 0.5s;
+        transition: all linear 0.5s;
+    }
+    .slideR-leave {
+        position: relative;
+        -webkit-transition: all linear 0.25s;
+        -moz-transition: all linear 0.25s;
+        -ms-transition: all linear 0.25s;
+        -o-transition: all linear 0.25s;
+        transition: all linear 0.25s;
+    }    
+    .slideR-enter {
         left: -200%;
     }
-    .slide-enter-active {
+    .slideR-enter-active {
         left: 0px;
     }
-    .slide-leave {
+    .slideR-leave {
         left: 0px;
     }
-    .slide-leave-active {
+    .slideR-leave-active {
         left: 100%;
     }
 
