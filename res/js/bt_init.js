@@ -20,12 +20,16 @@ var btView = function(obj) {
     if (this.name == null) this.name = '';
     if (this.url == null) this.url = '';
     if (this.depth == null) this.depth = 0;
+    // Set uninherited methods
+    if (this.verify == null) this.verify = function() { return true; };
+    if (this.onLoad == null) this.onLoad = null;
+    if (this.onUnload == null) this.onUnload = null;
 }
 
 
 // Initialize main game module
 // ---------------------------------------------------------------------------------------------------------------------
-var app = angular.module('bt', []);
+var app = angular.module('bt', ['angular-json-rpc']);
 
 // Main application namespace
 // ---------------------------------------------------------------------------------------------------------------------
@@ -47,7 +51,25 @@ var bt = {
         },
         
         // Configuration namespace
-        config : { },
+        config : {
+            
+            // Views configuration namespace
+            views : {
+            
+                // Holds array of available views
+                viewsArray : [ /* Filled implicitly from other JS scripts */ ],
+                // Holds dictionary of avaliable views by name
+                viewsByName : { /* Filled implicitly from other JS scripts */ },
+                
+                // Adds new view
+                addView : function(name, view) {
+                    bt.config.views.viewsArray.push(view);
+                    bt.config.views.viewsByName[name] = view;
+                }
+            
+            }
+            
+        },
         
         // Navigation (between views) namespace
         navigation : {
@@ -74,11 +96,23 @@ var bt = {
                     }
                 }
                 // Check next view
-                if (bt.navigation.nextView != null) {
-                    // Select transition effect
-                    bt.effects.viewChange = ((bt.navigation.selectedView == null) || (bt.navigation.nextView.depth > bt.navigation.selectedView.depth) ? bt.effects.viewChangeIn : bt.effects.viewChangeOut);
-                    // Select view
-                    bt.navigation.selectedView = bt.navigation.nextView;
+                if ((bt.navigation.nextView != null)) {
+                    // Verify view available
+                    if (bt.navigation.nextView.verify()) {
+                        // Select transition effect
+                        bt.effects.viewChange = ((bt.navigation.selectedView == null) || (bt.navigation.nextView.depth > bt.navigation.selectedView.depth) ? bt.effects.viewChangeIn : bt.effects.viewChangeOut);
+                        // Run onLoad and onUnload callbacks
+                        if ((bt.navigation.selectedView != null) && (bt.navigation.selectedView.onUnload != null)) bt.navigation.selectedView.onUnload();
+                        if ((bt.navigation.nextView != null) && (bt.navigation.nextView.onLoad != null)) bt.navigation.nextView.onLoad();
+                        // Select view
+                        bt.navigation.selectedView = bt.navigation.nextView;
+                    } else {
+                        bt.navigation.nextView = bt.navigation.selectedView;
+                        throw 'ERROR: View not allowed!';
+                    }
+                } else {
+                    bt.navigation.nextView = bt.navigation.selectedView;
+                    throw 'ERROR: View not defined!';
                 }
                 
             }
@@ -112,7 +146,18 @@ var bt = {
         },
         
         // Services' hooks
-        services : { /* Filled implicitly from other JS scripts */ }
+        services : {
+            
+            /* Filled implicitly from other JS scripts */
+        
+            // Takes a service name reference and function with initialted service for argument and executes function over service
+            execute : function (service, fn) {
+                if (typeof service == 'string') service = angular.element(document.body).injector().get(service);
+                fn(service);
+                angular.element(document.body).scope().$apply();                
+            }
+            
+        }
 
     }
 
