@@ -23,47 +23,10 @@ bt.config.views.addView('battleView',   {
 
 // Battle service
 /*
-        Console call syntax:
+        Console call syntax example:
     
             bt.services.execute('battleService', function(service) {
                                                     service.getUsername(
-                                                                        function(data) { console.log("Success:"); console.log(data); },
-                                                                        function(data) { console.log("Fail:"); console.log(data); }
-                                                                    );
-                                                });
-            bt.services.execute('battleService', function(service) {
-                                                    service.timeLeft(
-                                                                        function(data) { console.log("Success:"); console.log(data); },
-                                                                        function(data) { console.log("Fail:"); console.log(data); }
-                                                                    );
-                                                });
-            bt.services.execute('battleService', function(service) {
-                                                    service.initialState(
-                                                                        function(data) { console.log("Success:"); console.log(data); },
-                                                                        function(data) { console.log("Fail:"); console.log(data); }
-                                                                    );
-                                                });
-            bt.services.execute('battleService', function(service) {
-                                                    service.lastResult(
-                                                                        function(data) { console.log("Success:"); console.log(data); },
-                                                                        function(data) { console.log("Fail:"); console.log(data); }
-                                                                    );
-                                                });
-            bt.services.execute('battleService', function(service) {
-                                                    service.getStates(
-                                                                        function(data) { console.log("Success:"); console.log(data); },
-                                                                        function(data) { console.log("Fail:"); console.log(data); }
-                                                                    );
-                                                });
-            bt.services.execute('battleService', function(service) {
-                                                    service.getLastState(
-                                                                        function(data) { console.log("Success:"); console.log(data); },
-                                                                        function(data) { console.log("Fail:"); console.log(data); }
-                                                                    );
-                                                });
-            bt.services.execute('battleService', function(service) {
-                                                    service.processAction(
-                                                                        'action type',
                                                                         function(data) { console.log("Success:"); console.log(data); },
                                                                         function(data) { console.log("Fail:"); console.log(data); }
                                                                     );
@@ -75,96 +38,19 @@ bt.services.battleService = app.factory('battleService', function (jsonRpc) {
         // Map service
         return  {
                     // Get username method
-                    getUsername : function(onSuccess, onFail) {
-                                    return jsonRpc.request(
-                                                            'get_username',
-                                                            { params : [] },
-                                                            function (data) {
-                                                                    if (onSuccess) onSuccess(data);
-                                                                },
-                                                            function (data) {
-                                                                    if (onFail) onFail(data);
-                                                                }
-                                                );
-                                },
+                    getUsername :   jsonRpc.method('get_username',      []),
                     // Time left method
-                    timeLeft : function(onSuccess, onFail) {
-                                    return jsonRpc.request(
-                                                            'time_left',
-                                                            { params : [] },
-                                                            function (data) {
-                                                                    if (onSuccess) onSuccess(data);
-                                                                },
-                                                            function (data) {
-                                                                    if (onFail) onFail(data);
-                                                                }
-                                                );
-                                },
+                    timeLeft :      jsonRpc.method('time_left',         []),
                     // Initial state method
-                    initialState : function(onSuccess, onFail) {
-                                    return jsonRpc.request(
-                                                            'initial_state',
-                                                            { params : [] },
-                                                            function (data) {
-                                                                    if (onSuccess) onSuccess(data);
-                                                                },
-                                                            function (data) {
-                                                                    if (onFail) onFail(data);
-                                                                }
-                                                );
-                                },
+                    initialState :  jsonRpc.method('initial_state',     []),
                     // Last result method
-                    lastResult : function(onSuccess, onFail) {
-                                    return jsonRpc.request(
-                                                            'last_result',
-                                                            { params : [] },
-                                                            function (data) {
-                                                                    if (onSuccess) onSuccess(data);
-                                                                },
-                                                            function (data) {
-                                                                    if (onFail) onFail(data);
-                                                                }
-                                                );
-                                },
+                    lastResult :    jsonRpc.method('last_result',       []),
                     // Get states method
-                    getStates : function(onSuccess, onFail) {
-                                    return jsonRpc.request(
-                                                            'get_states',
-                                                            { params : [] },
-                                                            function (data) {
-                                                                    if (onSuccess) onSuccess(data);
-                                                                },
-                                                            function (data) {
-                                                                    if (onFail) onFail(data);
-                                                                }
-                                                );
-                                },
+                    getStates :     jsonRpc.method('get_states',        []),
                     // Get last state method
-                    getLastState : function(onSuccess, onFail) {
-                                    return jsonRpc.request(
-                                                            'get_last_state',
-                                                            { params : [] },
-                                                            function (data) {
-                                                                    if (onSuccess) onSuccess(data);
-                                                                },
-                                                            function (data) {
-                                                                    if (onFail) onFail(data);
-                                                                }
-                                                );
-                                },
+                    getLastState :  jsonRpc.method('get_last_state',    []),
                     // Process action method
-                    processAction : function(type, onSuccess, onFail) {
-                                    return jsonRpc.request(
-                                                            'process_action',
-                                                            { params : { type : type } },
-                                                            function (data) {
-                                                                    if (onSuccess) onSuccess(data);
-                                                                },
-                                                            function (data) {
-                                                                    if (onFail) onFail(data);
-                                                                }
-                                                );
-                                }
+                    processAction : jsonRpc.method('process_action',    [])
                 }
 });
 

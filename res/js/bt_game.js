@@ -10,25 +10,24 @@
 
 // Authentication service
 /*
-        Console call syntax:
+        Console call syntax example:
     
             bt.services.execute('authService', function(service) {
                                                     service.authenticate( 'atkr', 'atkr2', function() { alert("Success"); }, function() { alert("Fail!"); } );
                                                 });
 */
-bt.services.authService = app.factory('authService', function ($http, $log) {
+bt.services.authService = app.factory('authService', function ($http) {
         return {
             
             // Authenticate method, takes onSuccess and onFail callback functions
             // Calls authentication service and trys authenticating user
-            authenticate : function(username, password, onSuccess, onFail) {
+            authenticate : function(username, password, onSuccess, onFail, onError) {
                 // Check if authentication in progress
                 if (bt.game.common.user.login._isAuthenticating) return false;
                 // Update username and password
                 if (username != null) bt.game.common.user.login.username = username;
                 if (password != null) bt.game.common.user.login.password = password;
                 // Prompt authenticating
-                $log.info('Authenticating ...');
                 // Set authenticating username and status
                 bt.game.common.user.login._isAuthenticating = true;
                 bt.game.common.user.login._authUsername = bt.game.common.user.login.username
@@ -43,30 +42,46 @@ bt.services.authService = app.factory('authService', function ($http, $log) {
                     
                     // Handle response: Success / Check response
                     if (data.login == "successful") {
-                        // Prompt success
-                        $log.info('User authentication successfull!', data, status, headers(), config);
-                        bt.game.common.user.login.setMessage('Authentication successfull for "' + bt.game.common.user.login._authUsername + '"');
                         // Authenticate
                         bt.game.common.user.username = bt.game.common.user.login._authUsername;
                         // Execute callback
                         if (onSuccess) onSuccess(data, status, headers(), config);
+                        // Fire event
+                        bt.services.authService.authSuccess.dispatch({
+                                                                        detail: {
+                                                                            message:'Authentication successfull.',
+                                                                            time: new Date(),
+                                                                        },
+                                                                        
+                                                                });
                     } else {
-                        // Prompt fail
-                        $log.info('User authentication failed!', data, status, headers(), config);
-                        bt.game.common.user.login.setMessage('Authentication failed!');
                         // Execute callback
                         if (onFail) onFail(data, status, headers(), config);
+                        // Fire event
+                        bt.services.authService.authFail.dispatch({
+                                                                        detail: {
+                                                                            message:'Authentication failed.',
+                                                                            time: new Date(),
+                                                                        },
+                                                                        
+                                                                });
                     }
                     // Set authenticating status
                     bt.game.common.user.login._isAuthenticating = false;
                     
                 }).error(function(data, status, headers, config) {
                     
-                    // Prompt error
-                    $log.warn('User authentication error!', data, status, headers(), config);
-                    bt.game.common.user.login.setMessage('Authentication error!');
                     // Execute callback
+                    if (onError) onError(data, status, headers(), config);
                     if (onFail) onFail(data, status, headers(), config);
+                    // Fire event
+                    bt.services.authService.authError.dispatch({
+                                                                        detail: {
+                                                                            message:'Authentication error!',
+                                                                            time: new Date(),
+                                                                        },
+                                                                        
+                                                                });
                     // Set authenticating status
                     bt.game.common.user.login._isAuthenticating = false;
                     
@@ -116,18 +131,22 @@ bt.game.common = {
             // Holds user's username
             username : 'atkr',
             // Holds user's password
-            password : 'atkr',
-            
-            // Holds login message to be displayed
-            message : '',
-            // Sets new login message
-            setMessage : function(message) {
-                // Set message
-                bt.game.common.user.login.message = message;
-            }
+            password : 'atkr'
 
         },
         
     }
     
 }
+
+// Custom events definitions
+// ---------------------------------------------------------------------------------------------------------------------
+
+// @ bt.services.authService
+
+// "Authentication successfull" event
+bt.events.define(bt.services.authService, 'authSuccess');
+// "Authentication failed" event (Fired when server invalidates authentication)
+bt.events.define(bt.services.authService, 'authFail');
+// "Authentication error" event (Fired on authentication request error)
+bt.events.define(bt.services.authService, 'authError');

@@ -26,3 +26,6 @@ bt.config.views.addView('frontpage',    {
                                             onUnload : function() { console.log('> Unloading frontpage view!'); }
                                         });
 bt.navigation.selectView( bt.config.views.viewsByName.frontpage );
+
+// Set debugging options
+bt.debugging.events.pushToConsole = true;

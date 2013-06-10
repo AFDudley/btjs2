@@ -6,6 +6,7 @@ angular.module('angular-json-rpc', []);
 var jsonRpc = angular.module('angular-json-rpc', []).factory("jsonRpc", ['$http', function($http) {
 	this.version = "2.0";
 
+	var jsonRpcBase = this;
 	this.url = null;
 
 	//
@@ -30,7 +31,7 @@ var jsonRpc = angular.module('angular-json-rpc', []).factory("jsonRpc", ['$http'
 	//
 	// json-rpc request
 	//
-	this.request = function(method, options, onSuccess, onFail){
+	this.request = function(method, options, onSuccess, onFail, onError){
 		if(options === undefined) 
         	options = { id: 1 };
 
@@ -49,11 +50,37 @@ var jsonRpc = angular.module('angular-json-rpc', []).factory("jsonRpc", ['$http'
 				}
         		return data;
         	}).error(function (data, status, headers, config) {
-				if (onFail) onFail(data);
+				if (onError) onError(data);
+				if (onFail) onFail(data.error);
         		return data;
         	});
         // return
         return true;
+	}
+	
+	//
+	// json-recp request method definition
+	//
+	this.method = function(name, parameters, onSuccess, onFail, onError) {
+		// Define method call
+		var methodCall = function(onSuccess, onFail, onError) {
+								jsonRpcBase.request(
+											name,
+											{ params : parameters },
+											function (data) {
+													if (onSuccess) onSuccess(data);
+												},
+											function (data) {
+													if (onFail) onFail(data);
+												},
+											function (data) {
+												if (onError) onError(data);
+											}
+								);
+							};
+		// Reference parent jsonRpc object
+		// Return mathod call
+		return methodCall
 	}
 
 	//

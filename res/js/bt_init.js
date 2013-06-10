@@ -106,13 +106,34 @@ var bt = {
                         if ((bt.navigation.nextView != null) && (bt.navigation.nextView.onLoad != null)) bt.navigation.nextView.onLoad();
                         // Select view
                         bt.navigation.selectedView = bt.navigation.nextView;
+                        // Fire event
+                        bt.navigation.viewChanged.dispatch({
+                                                                detail: {
+                                                                    message:'View "' + bt.navigation.nextView.name + '" selected.',
+                                                                    time: new Date(),
+                                                                }
+                                                            });
                     } else {
+                        // Fire event
+                        bt.navigation.viewRejected.dispatch({
+                                                                detail: {
+                                                                    message:'View "' + bt.navigation.nextView.name + '" verification rejected.',
+                                                                    time: new Date(),
+                                                                }
+                                                            });
+                        // Clean up
                         bt.navigation.nextView = bt.navigation.selectedView;
-                        throw 'ERROR: View not allowed!';
                     }
                 } else {
+                    // Fire event
+                    bt.navigation.viewError.dispatch({
+                                                        detail: {
+                                                            message:'Failed loading view!',
+                                                            time: new Date(),
+                                                        }
+                                                    });
+                    // Clean up
                     bt.navigation.nextView = bt.navigation.selectedView;
-                    throw 'ERROR: View not defined!';
                 }
                 
             }
@@ -157,9 +178,86 @@ var bt = {
                 angular.element(document.body).scope().$apply();                
             }
             
+        },
+        
+        // Non DOM events namespace
+        events : {
+            
+            // Toggles events push to console
+            _pushToConsole : true,
+            
+            // Holds event listeners
+            _listeners : [ ],
+            
+            // Adds a definition of custom event
+            define : function(target, eventName) {
+                target[eventName] = {
+                    // Attach event name
+                    _bt_event_name : eventName,
+                    // Attach event target
+                    _bt_event_target : target,
+                    // Attach event subscriber to target
+                    subscribe : function(fn) {
+                        bt.events.subscribe(this._bt_event_target, this._bt_event_name, fn);
+                    },
+                    // Attach event dispatcher to target
+                    dispatch : function(event) {
+                        bt.events.dispatch(this._bt_event_target, this._bt_event_name, event);
+                    }                    
+                }
+            },
+            
+            // Subscribes to event on target
+            subscribe : function(target, eventName, fn) {
+                // Add to global event registry
+                if (bt.events._listeners[eventName] == null) bt.events._listeners[eventName] = [ ];
+                bt.events._listeners[eventName].push(fn);
+                // Add to global event registry
+                if (target[eventName]._bt_event_subscribed == null) target[eventName]._bt_event_subscribed = [ ];
+                target[eventName]._bt_event_subscribed.push(fn);
+            },
+            // Dispatch event for target
+            dispatch : function(target, eventName, event) {
+                // Check if pushing to console
+                if (bt.debugging.events.publishToConsole) {
+                    console.log('Event "' + eventName + '" dispatched to ' + (target[eventName]._bt_event_subscribed ? target[eventName]._bt_event_subscribed.length : '0') + ' listeners! Event fired by:');
+                    console.log(target);
+                }
+                // Process event listeners
+                if (target[eventName]._bt_event_subscribed) {
+                    for (var i in target[eventName]._bt_event_subscribed) {
+                        var fn = target[eventName]._bt_event_subscribed[i];
+                        fn(event, target);
+                    }
+                }
+            }
+            
+        },
+        
+        // Debugging / Testing namespace
+        debugging : {
+            
+            // Events namespace
+            events : {
+                // Toggles events push to console
+                publishToConsole : false
+            }
         }
 
     }
+
+
+// Custom events definitions
+// ---------------------------------------------------------------------------------------------------------------------
+
+// @ bt.navigation
+
+// "View changed" event
+bt.events.define(bt.navigation, 'viewChanged');
+// 'View rejected' event (Fired when view verification fails)
+bt.events.define(bt.navigation, 'viewRejected');
+// 'View error' event (Fired when view loading fails)
+bt.events.define(bt.navigation, 'viewError');
 
 
 // Startup

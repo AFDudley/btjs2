@@ -57,3 +57,13 @@
                                                             );
                                         });
 ```
+
+## Debugging options
+
+### Events
+
+To control if all raised events are to be published to console toggle property:
+```javascript
+bt.debugging.events.publishToConsole = true | false;
+```
+
