@@ -96,3 +96,39 @@ div.section {
     font-size: 11px;
     color: c6ff00;
 }
+
+/* Page markup (TEMP)
+ * ---------------------------------------------------------------------------------------------------------------------- */
+
+div.menu {
+    clear: both;
+    float: left;
+    margin: 10px 0px 0px 0px;
+    padding: 4px;
+}
+div.menu div.link {
+    float: left;
+    margin: 0px 4px 0px 0px;
+}
+div.menu div.link a {
+    padding: 5px;
+    cursor: pointer;
+    border: 1px solid #444444;
+}
+div.menu div.link:hover a {
+    padding: 4px;
+    border: 2px solid #444444;
+}
+
+/* Battle view markup (TEMP)
+ * ---------------------------------------------------------------------------------------------------------------------- */
+
+div.timers {
+    float: right;
+    margin: 4px 10px 4px 10px;
+    padding: 4px;
+    border: 1px solid #444444;
+}
+div.timer {
+    color: #990000;
+}

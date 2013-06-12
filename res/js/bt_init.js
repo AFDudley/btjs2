@@ -13,7 +13,7 @@
 var btView = function(obj) {
     // Inherits from passed object
     if ((obj !== null) && (typeof obj == 'object')) {
-        this.extend(obj);
+        angular.extend(this, obj);
     }
     // Set uninherited properties
     if (this.id == null) this.id = '';
@@ -21,9 +21,14 @@ var btView = function(obj) {
     if (this.url == null) this.url = '';
     if (this.depth == null) this.depth = 0;
     // Set uninherited methods
-    if (this.verify == null) this.verify = function() { return true; };
+    if (this.isPublic == null) this.isPublic = true;
     if (this.onLoad == null) this.onLoad = null;
     if (this.onUnload == null) this.onUnload = null;
+    
+    // Validate method: checks if view can be loaded
+    if (this.validate == null) this.validate = function() {
+        return ((this.isPublic) || ((bt.game) && (bt.game.authentication) && (bt.game.authentication.isAuthenticated)));
+    }
 }
 
 
@@ -61,80 +66,41 @@ var bt = {
                 // Holds dictionary of avaliable views by name
                 viewsByName : { /* Filled implicitly from other JS scripts */ },
                 
+                // Holds reference to currently selected view
+                _currentView : null,
+                // Holds default public (unauthenticated) view
+                _defaultPublicView : null,
+                // Holds default private (authenticated) view
+                _defaultPrivateView : null,
+                
                 // Adds new view
-                addView : function(name, view) {
+                addView : function(name, view, isDefaultPublic, isDefaultAuthenticated) {
+                    // Wrap view as btView object
+                    view = new btView(view);
+                    // Check defaults
+                    if (isDefaultPublic) bt.config.views._defaultPublicView = view;
+                    if (isDefaultAuthenticated) bt.config.views._defaultPrivateView = view;
+                    // Set ordering properties
+                    view._index = bt.config.views.viewsArray.length;
+                    view._key = name;
+                    // Add view to registry
                     bt.config.views.viewsArray.push(view);
                     bt.config.views.viewsByName[name] = view;
+                    // Set route
+                    app.config(['$routeProvider', function($routeProvider) {
+                            // Set route to view
+                            $routeProvider  .when('/' + view._key, { templateUrl: view.url })
+                                            .otherwise('/');
+                        }]);
                 }
             
-            }
+            },
             
-        },
-        
-        // Navigation (between views) namespace
-        navigation : {
-            
-            // Holds reference to the selected view
-            selectedView : null,
-            // Holds reference to next view
-            nextView : null,
-            // Selects passed view
-            selectView : function(view) {
-                // Get next view
-                if (view == null) {
-                    // Already got next view
-                } else if (typeof view == 'object') {
-                    // Set view object
-                    bt.navigation.nextView = view;
-                } else {
-                    // Get object by name
-                    for (var i in bt.config.views) {
-                        if (bt.config.views[i].name == view) {
-                            bt.navigation.nextView = bt.config.views[i];
-                            break;
-                        }
-                    }
-                }
-                // Check next view
-                if ((bt.navigation.nextView != null)) {
-                    // Verify view available
-                    if (bt.navigation.nextView.verify()) {
-                        // Select transition effect
-                        bt.effects.viewChange = ((bt.navigation.selectedView == null) || (bt.navigation.nextView.depth > bt.navigation.selectedView.depth) ? bt.effects.viewChangeIn : bt.effects.viewChangeOut);
-                        // Run onLoad and onUnload callbacks
-                        if ((bt.navigation.selectedView != null) && (bt.navigation.selectedView.onUnload != null)) bt.navigation.selectedView.onUnload();
-                        if ((bt.navigation.nextView != null) && (bt.navigation.nextView.onLoad != null)) bt.navigation.nextView.onLoad();
-                        // Select view
-                        bt.navigation.selectedView = bt.navigation.nextView;
-                        // Fire event
-                        bt.navigation.viewChanged.dispatch({
-                                                                detail: {
-                                                                    message:'View "' + bt.navigation.nextView.name + '" selected.',
-                                                                    time: new Date(),
-                                                                }
-                                                            });
-                    } else {
-                        // Fire event
-                        bt.navigation.viewRejected.dispatch({
-                                                                detail: {
-                                                                    message:'View "' + bt.navigation.nextView.name + '" verification rejected.',
-                                                                    time: new Date(),
-                                                                }
-                                                            });
-                        // Clean up
-                        bt.navigation.nextView = bt.navigation.selectedView;
-                    }
-                } else {
-                    // Fire event
-                    bt.navigation.viewError.dispatch({
-                                                        detail: {
-                                                            message:'Failed loading view!',
-                                                            time: new Date(),
-                                                        }
-                                                    });
-                    // Clean up
-                    bt.navigation.nextView = bt.navigation.selectedView;
-                }
+            // Server poling namespace
+            poling : {
+                
+                // Holds value for minimal time interval between polling same service in [ms]
+                minimalIntervalBetweenPolls : 2000
                 
             }
             
@@ -184,7 +150,7 @@ var bt = {
         events : {
             
             // Toggles events push to console
-            _pushToConsole : true,
+            publishToConsole : true,
             
             // Holds event listeners
             _listeners : [ ],
@@ -218,10 +184,13 @@ var bt = {
             },
             // Dispatch event for target
             dispatch : function(target, eventName, event) {
+                // Format event
+                if (typeof event == 'string') event = { message : event, time : new Date() };
                 // Check if pushing to console
                 if (bt.debugging.events.publishToConsole) {
-                    console.log('Event "' + eventName + '" dispatched to ' + (target[eventName]._bt_event_subscribed ? target[eventName]._bt_event_subscribed.length : '0') + ' listeners! Event fired by:');
+                    console.log('>>> Event "' + eventName + '" dispatched to ' + (target[eventName]._bt_event_subscribed ? target[eventName]._bt_event_subscribed.length : '0') + ' listeners! Folowing event / target:');
                     console.log(target);
+                    console.log(event);
                 }
                 // Process event listeners
                 if (target[eventName]._bt_event_subscribed) {
@@ -253,16 +222,75 @@ var bt = {
 // @ bt.navigation
 
 // "View changed" event
-bt.events.define(bt.navigation, 'viewChanged');
+bt.events.define(bt.config.views, 'viewAccepted');
 // 'View rejected' event (Fired when view verification fails)
-bt.events.define(bt.navigation, 'viewRejected');
+bt.events.define(bt.config.views, 'viewPrevented');
+// 'View rejected' event (Fired when view verification fails)
+bt.events.define(bt.config.views, 'viewChanged');
 // 'View error' event (Fired when view loading fails)
-bt.events.define(bt.navigation, 'viewError');
+bt.events.define(bt.config.views, 'viewFailed');
 
 
 // Startup
 // ---------------------------------------------------------------------------------------------------------------------
 
+// Handle route changes and view verification
+app.run( function($rootScope, $location) {
+    
+        // Handle route changing event
+        $rootScope.$on( "$routeChangeStart", function(event, next, current) {
+                // Find and validate route/view
+                if (next.templateUrl) {
+                    for (var name in bt.config.views.viewsByName) {
+                        var view = bt.config.views.viewsByName[name];
+                        if ((next.templateUrl == view.url) && (view.validate())) {
+                            // Selected view validated
+                            if (view != bt.config.views._currentView) {
+                                if (bt.config.views._currentView) bt.config.views._currentView.onUnload();
+                                view.onLoad();
+                                bt.config.views._currentView = view;
+                            }
+                            bt.config.views.viewAccepted.dispatch( 'View "' + next.templateUrl + '" selected.' );
+                            return;
+                        }
+                    }
+                }
+                // Prevent route
+                event.preventDefault();
+                bt.config.views.viewPrevented.dispatch( 'View "' + next.templateUrl + '" prevented.' );
+                // Fallback to default route
+                if (bt.config.views._defaultPrivateView.validate()) {
+                    next.templateUrl = bt.config.views._defaultPrivateView.url;
+                    if (view != bt.config.views._currentView) {
+                        if (bt.config.views._currentView) bt.config.views._currentView.onUnload();
+                        bt.config.views._defaultPrivateView.onLoad();
+                        bt.config.views._currentView = bt.config.views._defaultPrivateView;
+                    }
+                    $location.path('/' + bt.config.views._defaultPrivateView._key);
+                } else {
+                    next.templateUrl = bt.config.views._defaultPublicView.url;
+                    if (view != bt.config.views._currentView) {
+                        if (bt.config.views._currentView) bt.config.views._currentView.onUnload();
+                        bt.config.views._defaultPublicView.onLoad();
+                        bt.config.views._currentView = bt.config.views._defaultPublicView;
+                    }
+                    $location.path('/' + bt.config.views._defaultPublicView._key);
+                }
+            });
+        
+        // Handle route changed or failed events
+        $rootScope.$on( "$routeChangeSuccess", function(event, next, current) {
+                // Selected view validated
+                bt.config.views.viewChanged.dispatch( 'View "' + next.templateUrl + '" changed.' );
+            });
+        $rootScope.$on( "$routeChangeError", function(event, next, current) {
+                // Selected view validated
+                bt.config.views.viewFailed.dispatch( 'View "' + next.templateUrl + '" failed.' );
+            });
+        
+    });
+
+// On loaded
 window.addEventListener('load', function() {
 
         // Nothing so far ...

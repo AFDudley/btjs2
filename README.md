@@ -13,43 +13,43 @@
 ### Battle service (not hooked to view model, will not have UI manifestation)
 
 ```javascript
-    bt.services.execute('battleService', function(service) {
+    bt.services.execute('BattleService', function(service) {
                                             service.getUsername(
                                                                 function(data) { console.log("Success:"); console.log(data); },
                                                                 function(data) { console.log("Fail:"); console.log(data); }
                                                             );
                                         });
-    bt.services.execute('battleService', function(service) {
+    bt.services.execute('BattleService', function(service) {
                                             service.timeLeft(
                                                                 function(data) { console.log("Success:"); console.log(data); },
                                                                 function(data) { console.log("Fail:"); console.log(data); }
                                                             );
                                         });
-    bt.services.execute('battleService', function(service) {
+    bt.services.execute('BattleService', function(service) {
                                             service.initialState(
                                                                 function(data) { console.log("Success:"); console.log(data); },
                                                                 function(data) { console.log("Fail:"); console.log(data); }
                                                             );
                                         });
-    bt.services.execute('battleService', function(service) {
+    bt.services.execute('BattleService', function(service) {
                                             service.lastResult(
                                                                 function(data) { console.log("Success:"); console.log(data); },
                                                                 function(data) { console.log("Fail:"); console.log(data); }
                                                             );
                                         });
-    bt.services.execute('battleService', function(service) {
+    bt.services.execute('BattleService', function(service) {
                                             service.getStates(
                                                                 function(data) { console.log("Success:"); console.log(data); },
                                                                 function(data) { console.log("Fail:"); console.log(data); }
                                                             );
                                         });
-    bt.services.execute('battleService', function(service) {
+    bt.services.execute('BattleService', function(service) {
                                             service.getLastState(
                                                                 function(data) { console.log("Success:"); console.log(data); },
                                                                 function(data) { console.log("Fail:"); console.log(data); }
                                                             );
                                         });
-    bt.services.execute('battleService', function(service) {
+    bt.services.execute('BattleService', function(service) {
                                             service.processAction(
                                                                 'action type',
                                                                 function(data) { console.log("Success:"); console.log(data); },

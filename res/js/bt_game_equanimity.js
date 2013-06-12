@@ -7,12 +7,12 @@
 
 // Initialize equanimity view
 // ---------------------------------------------------------------------------------------------------------------------
-bt.config.views.addView('equanimityView',   {
+bt.config.views.addView('equanimity',   {
                                             id : 'bt.game.equanimity',
-                                            name : 'equanimity view ( ... must login first )',
+                                            name : 'EQUANIMITY',
                                             url : 'res/partials/views/equanimity.html',
                                             depth : 2,
-                                            verify : function() { return (bt.game.common.user.username != null) && (bt.game.common.user.username.length > 0); },
+                                            isPublic : false,
                                             onLoad : function() { console.log('> Loading equanimity view!'); },
                                             onUnload : function() { console.log('> Unloading equanimity view!'); }
                                         });
