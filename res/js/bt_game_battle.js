@@ -79,6 +79,7 @@ bt.game.battle = {
     // View manipulation namespace
     view : {
         // On view load
+        // TODO: Set interval inside Angular context
         onLoad : function() {
                     // Query server time
                     bt.game.battle.timers.query();
@@ -87,10 +88,11 @@ bt.game.battle = {
                     bt.game.battle.timers._interval = setInterval(bt.game.battle.timers.update, 1000);
             },
         // On view unload
+        // TODO: Set interval inside Angular context
         onUnload : function() {
                     // Stop timer interval
                     if (bt.game.battle.timers._interval) clearInterval(bt.game.battle.timers._interval);
-            },        
+            }
     },
     
     // Battle timers namespace
@@ -176,7 +178,7 @@ bt.game.battle = {
                                                         });
                 // Fire event
                 bt.services.battleService.Updated.dispatch({
-                                                            message: 'Updated "BattleService" timers',
+                                                            message: 'Updated "BattleService" timers'
                                                         });
             }
         }

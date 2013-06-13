@@ -24,7 +24,7 @@ var btView = function(obj) {
     if (this.isPublic == null) this.isPublic = true;
     if (this.onLoad == null) this.onLoad = null;
     if (this.onUnload == null) this.onUnload = null;
-    
+
     // Validate method: checks if view can be loaded
     if (this.validate == null) this.validate = function() {
         return ((this.isPublic) || ((bt.game) && (bt.game.authentication) && (bt.game.authentication.isAuthenticated)));
@@ -106,18 +106,6 @@ var bt = {
             
         },
         
-        // Transition effects namespace
-        effects : {
-            
-            // Holds current view changed effect
-            viewChange      : '', 
-            // Names 'view change in' transition effect
-            viewChangeIn    : 'slideL',
-            // Names 'view change out' transition effect
-            viewChangeOut   : 'slideR'
-            
-        },
-        
         // Game namespace ()
         game : {
         
@@ -145,7 +133,27 @@ var bt = {
             }
             
         },
-        
+
+        // Data model definitions namespace
+        model : {
+
+            // Model definitions namespace
+            definitions : { /* Filled implicitly from other JS scripts */ },
+
+            // Extends from object or array of objects
+            extend : function(target, objs) {
+                // Check if object or array
+                if (angular.isArray(objs)) {
+                    // Extend from array
+                    for (var obj in objs) angular.extend(target, objs[obj]);
+                } else {
+                    // Extend from object
+                    angular.extend(target, objs);
+                }
+            }
+
+        },
+
         // Non DOM events namespace
         events : {
             
@@ -210,6 +218,12 @@ var bt = {
             events : {
                 // Toggles events push to console
                 publishToConsole : false
+            },
+
+            // Data model namespace
+            model : {
+                // Toggles if model constructors will test received properties
+                verifyModelConstructors : false
             }
         }
 
@@ -236,7 +250,7 @@ bt.events.define(bt.config.views, 'viewFailed');
 
 // Handle route changes and view verification
 app.run( function($rootScope, $location) {
-    
+
         // Handle route changing event
         $rootScope.$on( "$routeChangeStart", function(event, next, current) {
                 // Find and validate route/view
@@ -281,13 +295,13 @@ app.run( function($rootScope, $location) {
         // Handle route changed or failed events
         $rootScope.$on( "$routeChangeSuccess", function(event, next, current) {
                 // Selected view validated
-                bt.config.views.viewChanged.dispatch( 'View "' + next.templateUrl + '" changed.' );
+                if ((!current) || (next.templateUrl != current.templateUrl)) bt.config.views.viewChanged.dispatch( 'View "' + next.templateUrl + '" changed.' );
             });
         $rootScope.$on( "$routeChangeError", function(event, next, current) {
                 // Selected view validated
-                bt.config.views.viewFailed.dispatch( 'View "' + next.templateUrl + '" failed.' );
+            if ((!current) || (next.templateUrl != current.templateUrl)) bt.config.views.viewFailed.dispatch( 'View "' + next.templateUrl + '" failed.' );
             });
-        
+
     });
 
 // On loaded

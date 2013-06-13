@@ -3,27 +3,30 @@
     <head>
         <title>Binary Tactics</title>
         
-        <link rel="stylesheet"href="res/css/main.css" type="text/css" media="all" />     
+        <link rel="stylesheet" href="res/css/main.css" type="text/css" media="all" />
     </head>
     
     <body ng-controller="bt.ng.controller">
 
         <!-- Header -->
         <div class="section">
-            <a ng-show=" bt.game.authentication.isAuthenticated ">Current user: {{ bt.game.authentication.username }}</a>
+            <a>Current user: </a>
+            <a ng-show=" bt.game.authentication.isAuthenticated ">{{ bt.game.authentication.username }}</a>
             <hr/>
             <div class="menu">
-                <div class="link" ng-repeat=" (key, view) in bt.config.views.viewsByName | orderBy: view._index ">
-                <a ng-if=" view.isPublic || bt.game.authentication.isAuthenticated " href="#{{ key }}"> {{ view.name }} </a>
+                <div class="link viewAnimationContainer" ng-repeat=" view in bt.config.views.viewsArray | orderBy: view._index ">
+                    <a ng-if=" view.isPublic || bt.game.authentication.isAuthenticated " href="#{{ view._key }}"> {{ view.name }} </a>
                 </div>
             </div>
             <div style="clear: both"></div>
         </div>
+
+        <div></div>
         
         <!-- Includes current view -->
-        <div ng-view ng-animate=" bt.effects.viewChange "></div>
+        <div ng-view class="viewAnimationContainer" ng-animate=" { enter: 'enterFromLeft', leave: 'leaveToRight' } "></div>
         
-        <!-- 3rd party: JS inclusions -->
+
         <script type="text/javascript" src="res/js/3rd_party/angular.115.js"></script>
         <!-- Not yet needed: <script type="text/javascript" src="res/js/3rd_party/angular_resource.115.js"></script> -->
         <script type="text/javascript" src="res/js/3rd_party/angular_jsonrpc.js"></script>
@@ -32,9 +35,11 @@
         <script type="text/javascript" src="res/js/bt_init.js"></script>
         <script type="text/javascript" src="res/js/bt_config.js"></script>
         <script type="text/javascript" src="res/js/bt_authentication.js"></script>
+        <script type="text/javascript" src="res/js/model/bt_model.js"></script>
         <script type="text/javascript" src="res/js/bt_game_frontpage.js"></script>
         <script type="text/javascript" src="res/js/bt_game_equanimity.js"></script>
         <script type="text/javascript" src="res/js/bt_game_battle.js"></script>
+        <script type="text/javascript" src="res/js/model/bt_model_battle.js"></script>
         <script type="text/javascript" src="res/js/bt_game_equipment.js"></script>
     </body>
 </html>

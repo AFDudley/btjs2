@@ -10,66 +10,38 @@
 
 
 /*      Elements animations
-// =========================================================================================================== */
+// ====================================================================================================================== */
 
     /* DOM manipulation animations: Slide in/out */
-    .slideL-enter {
+
+    .animationContainer { }
+
+    .enterFromLeft, .enterFromRight, .enterFade {
         position: relative;
-        -webkit-transition: all linear 0.5s;
-        -moz-transition: all linear 0.5s;
-        -ms-transition: all linear 0.5s;
-        -o-transition: all linear 0.5s;
-        transition: all linear 0.5s;
+        transition: all linear 0.4s;
     }
-    .slideL-leave {
+    .leaveToLeft, .leaveToRight, .leaveFade {
         position: relative;
-        -webkit-transition: all linear 0.25s;
-        -moz-transition: all linear 0.25s;
-        -ms-transition: all linear 0.25s;
-        -o-transition: all linear 0.25s;
-        transition: all linear 0.25s;
-    }    
-    .slideL-enter {
-        right: -200%;
-    }
-    .slideL-enter-active {
-        right: 0px;
-    }
-    .slideL-leave {
-        right: 0px;
-    }
-    .slideL-leave-active {
-        right: 100%;
+        transition: all linear 0.2s;
     }
 
-    .slideR-enter {
-        position: relative;
-        -webkit-transition: all linear 0.5s;
-        -moz-transition: all linear 0.5s;
-        -ms-transition: all linear 0.5s;
-        -o-transition: all linear 0.5s;
-        transition: all linear 0.5s;
-    }
-    .slideR-leave {
-        position: relative;
-        -webkit-transition: all linear 0.25s;
-        -moz-transition: all linear 0.25s;
-        -ms-transition: all linear 0.25s;
-        -o-transition: all linear 0.25s;
-        transition: all linear 0.25s;
-    }    
-    .slideR-enter {
-        left: -200%;
-    }
-    .slideR-enter-active {
-        left: 0px;
-    }
-    .slideR-leave {
-        left: 0px;
-    }
-    .slideR-leave-active {
-        left: 100%;
-    }
+    .enterFromLeft                              { left: -200%; }
+    .enterFromLeft.enterFromLeft-active         { left: 0px; }
+
+    .enterFromRight                             { right: -200%; }
+    .enterFromRight.enterFromRight-active       { right: 0px; }
+
+    .enterFade                                  { opacity: 0; }
+    .enterFade.enterFade-active                 { opacity: 1; }
+
+    .leaveToLeft                                { left: 0px; }
+    .leaveToLeft.leaveToLeft-active             { left: -100%; }
+
+    .leaveToRight                               { right: 0px; }
+    .leaveToRight.leaveToRight-active           { right: -100%; }
+
+    .leaveFade                                  { opacity: 1; }
+    .leaveFade.leaveFade-active                 { opacity: 0; }
 
 
 /* Generic
@@ -94,7 +66,6 @@ div.section {
     
     font-family: monospace;
     font-size: 11px;
-    color: c6ff00;
 }
 
 /* Page markup (TEMP)

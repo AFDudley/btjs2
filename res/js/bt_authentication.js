@@ -30,7 +30,7 @@ bt.services.authenticationService = app.factory('AuthenticationService', functio
                 // Prompt authenticating
                 // Set authenticating username and status
                 bt.game.authentication.login._isAuthenticating = true;
-                bt.game.authentication.login._authUsername = bt.game.authentication.login.username
+                bt.game.authentication.login._authUsername = bt.game.authentication.login.username;
                 $http({
                     
                     // Service call configuration
@@ -104,7 +104,7 @@ bt.game.authentication = {
         // Holds user's password
         password : 'atkr'
 
-    },
+    }
 
 }
 
