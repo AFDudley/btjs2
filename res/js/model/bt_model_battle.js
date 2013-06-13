@@ -1,11 +1,11 @@
 "use strict";
 
 /* =====================================================================================================================
- *  Binary tactics: 'Battle data model' definition
+ *  Binary tactics: 'Battle view's data model' definitions
  * ================================================================================================================== */
 
 
-// Initialize data model
+// Battle view's data model definition
 // ---------------------------------------------------------------------------------------------------------------------
 bt.model.definitions.battle = {
 
@@ -19,17 +19,46 @@ bt.model.definitions.battle = {
         }
     },
 
-    // Differentiated stone definition
-    dStone : function(obj) {
-         // Extend pased object
-        if (obj) bt.model.extend(this, obj);
+    // Stone as composition
+    cStone : function(obj) {
         // Verify children
         if (bt.debugging.model.verifyModelConstructors) {
-            if (!angular.isDefined(this.comp)) console.error(obj, 'Weapon object definition incomplete: Missing composition!!');
-            if (!angular.isDefined(this.element)) console.error(obj, 'Weapon object definition incomplete: Missing element differentiation!');
+            if (!angular.isDefined(obj.comp)) console.error(obj, 'cStone object definition incomplete: Missing composition!!');
         }
         // Initialize children
-        this.comp = new bt.model.definitions.battle.stone(this.comp);
+        this.comp = new bt.model.definitions.battle.stone(obj.comp);
+    },
+
+    // Differentiated stone definition
+    dStone : function(obj) {
+        // Extend pased object
+        if (obj) bt.model.extend(this, new bt.model.definitions.battle.cStone(obj));
+        // Verify children
+        if (bt.debugging.model.verifyModelConstructors) {
+            if (!angular.isDefined(obj.element)) console.error(obj, 'dStone object definition incomplete: Missing element differentiation!');
+        }
+        // Initialize children
+        this.element = obj.element;
+    },
+
+    // Localized definition
+    localized : function(obj) {
+        // Extend location from passed object
+        if ((angular.isDefined(obj.location)) && (obj.location.length == 2)) {
+            this.location = {
+                x : obj.location[0],
+                y : obj.location[1]
+            }
+        } else if ((angular.isDefined(obj.location)) && (angular.isDefined(obj.location.x)) && (angular.isDefined(obj.location.y))) {
+            this.location = {
+                x : obj.location.x,
+                y : obj.location.y
+            }
+        }
+        // Verify children
+        if (bt.debugging.model.verifyModelConstructors) {
+            if ((!angular.isDefined(this.location)) || (!angular.isDefined(this.location.x)) || (!angular.isDefined(this.location.y))) console.error(obj, 'Localized object definition incomplete: Missing location!');
+        }
     },
 
     // Weapon definition
@@ -58,16 +87,16 @@ bt.model.definitions.battle = {
     // Basic unit definition
     unit : function(obj) {
         // Extend pased object
-        if (obj) bt.model.extend(this, [obj, new bt.model.definitions.battle.dStone(obj)]);
+        if (obj) bt.model.extend(this, [obj, new bt.model.definitions.battle.dStone(obj), new bt.model.definitions.battle.localized(obj)]);
         // Verify children
         if (bt.debugging.model.verifyModelConstructors) {
-            if ((!angular.isDefined(this.location)) || (this.location.length != 2)) console.error(obj, 'Unit object definition incomplete: Missing location!');
             if (!angular.isDefined(this.name)) console.error(obj, 'Unit object definition incomplete: Missing name!');
         }
         // Initialize children
         this.updateStats = function() {
             this.value = this.comp[bt.model.common.elements.definitions.E] + this.comp[bt.model.common.elements.definitions.F] +this.comp[bt.model.common.elements.definitions.I] + this.comp[bt.model.common.elements.definitions.W];
             this.general = {
+                value : this.value,
                 attack : (4 * this.value),
                 defense : (2 * this.value)
             };
@@ -84,53 +113,172 @@ bt.model.definitions.battle = {
         this.updateStats();
     },
 
+    // Grid definition
+    unitsCollection : function() {
+        // Initialize children
+        this.units = [ ];
+        this.unitsById = [ ];
+        this.unitsByType = [ ];
+        this.unitsByOwner = [ ];
+
+        // Adds a tile to the grid
+        this.addUnit = function(unit) {
+            this.units.push(unit);
+            if (unit.id) {
+                if (!angular.isDefined(this.unitsById[unit.id])) this.unitsById[unit.id] = [ ];
+                this.unitsById[unit.id].push(unit);
+            }
+            if (unit.owner) {
+                if (!angular.isDefined(this.unitsByOwner[unit.owner])) this.unitsByOwner[unit.owner] = [ ];
+                this.unitsByOwner[unit.owner].push(unit);
+            }
+            if (unit._type) {
+                if (!angular.isDefined(this.unitsByType[unit._type])) this.unitsByType[unit._type] = [ ];
+                this.unitsByType[unit._type].push(unit);
+            }
+        }
+    },
+
     // Scient unit definition
     scient : function(obj) {
         // Extend pased object
         if (obj) bt.model.extend(this, [obj, new bt.model.definitions.battle.unit(obj)]);
         // Verify children
         if (bt.debugging.model.verifyModelConstructors) {
-            if (!angular.isDefined(this.id)) console.error(obj, 'Unit object definition incomplete: Missing id!');
-            if (!angular.isDefined(this.owner)) console.error(obj, 'Unit object definition incomplete: Missing owner!');
-            if (!angular.isDefined(this.sex)) console.error(obj, 'Unit object definition incomplete: Missing sex!');
-            if (!angular.isDefined(this.weapon)) console.error(obj, 'Unit object definition incomplete: Missing weapon!');
-            if ((!angular.isDefined(this.weapon_bonus)) || (!angular.isDefined(this.weapon_bonus.stone))) console.error(obj, 'Unit object definition incomplete: Missing weapon bonus!');
+            if (!angular.isDefined(this.id)) console.error(obj, 'Scient object definition incomplete: Missing id!');
+            if (!angular.isDefined(this.owner)) console.error(obj, 'Scient object definition incomplete: Missing owner!');
+            if (!angular.isDefined(this.sex)) console.error(obj, 'Scient object definition incomplete: Missing sex!');
+            if (!angular.isDefined(this.weapon)) console.error(obj, 'Scient object definition incomplete: Missing weapon!');
+            if ((!angular.isDefined(this.weapon_bonus)) || (!angular.isDefined(this.weapon_bonus.stone))) console.error(obj, 'Scient object definition incomplete: Missing weapon bonus!');
         }
         // Initialize children
+        this._type = bt.model.common.units.definitions.scient;
         this.weapon = new bt.model.definitions.battle.weapon(this.weapon);
         if (angular.isDefined(this.weaponBonus)) {
             this.weaponBonus = new bt.model.definitions.battle.stone(this.weaponBonus);
         } else if ( (angular.isDefined(this.weapon_bonus)) && (angular.isDefined(this.weapon_bonus.stone)) && (angular.isDefined(this.weapon_bonus.stone.comp)) ) {
-            this.weaponBonus = new bt.model.definitions.battle.stone(this.weapon_bonus.stone.comp);
+            this.weaponBonus = new bt.model.definitions.battle.cStone(this.weapon_bonus.stone);
         } else {
             this.weaponBonus = new bt.model.definitions.battle.stone();
         }
+    },
+
+    // Single grid tile definition
+    tile : function(obj) {
+        // Extend pased object
+        if (obj) bt.model.extend(this, [new bt.model.definitions.battle.localized(obj), new bt.model.definitions.battle.cStone(obj)]);
+        // Initialize children
+        this.contents = [ ];
+    },
+
+    // Grid definition
+    grid : function(obj) {
+        // Extend pased object
+        if (obj) bt.model.extend(this, [new bt.model.definitions.battle.cStone(obj)]);
+        // Verify children
+        if (bt.debugging.model.verifyModelConstructors) {
+            if (!angular.isDefined(obj.x)) console.error(obj, 'Grid object definition incomplete: Missing X!');
+            if (!angular.isDefined(obj.y)) console.error(obj, 'Grid object definition incomplete: Missing Y!');
+        }
+        // Initialize children
+        this.size  = { x : obj.x, y : obj.y };
+        this.tiles = [ ];
+        this.tilesByX = [ ];
+        this.tilesByY = [ ];
+
+        // Adds a tile to the grid
+        this.addTile = function(tile) {
+            this.tiles.push(tile);
+            if (!angular.isDefined(this.tilesByX[tile.location.x])) this.tilesByX[tile.location.x] = [];
+            this.tilesByX[tile.location.x][tile.location.y] = tile;
+            if (!angular.isDefined(this.tilesByY[tile.location.y])) this.tilesByY[tile.location.y] = [];
+            this.tilesByY[tile.location.y][tile.location.x] = tile;
+        }
+    },
+
+    battleField : function(obj) {
+
+        // Set base reference
+        var base = this;
+
+        // Initialization
+        // ---------------------------------------------------------
+
+        // Initialization section
+        this.initialState = {
+
+            // Initializes battle field from BattleService.init_state() response
+            initialize : function(obj) {
+                // Initialize grid
+                this.initializeGrid(obj);
+                // Initialize units
+                this.initializeUnits(obj);
+            },
+
+            // Initializes battle field's grid from BattleService.init_state() response
+            initializeGrid : function(obj) {
+                // Verify grid
+                if (bt.debugging.model.verifyModelConstructors) {
+                    if ((!angular.isDefined(obj.initial_state)) || (!angular.isDefined(obj.initial_state.grid)) || (!angular.isDefined(obj.initial_state.grid.grid)) || (!angular.isDefined(obj.initial_state.grid.grid.tiles))) console.error(obj, 'Grid object definition incomplete: Missing grid!');
+                }
+                // Initialize grid object
+                base.grid = new bt.model.definitions.battle.grid(obj.initial_state.grid.grid);
+                var tiles = obj.initial_state.grid.grid.tiles;
+                // Insert tiles
+                for (var x = 0; x < base.grid.size.x; x++) {
+                    // Verify tiles
+                    if (bt.debugging.model.verifyModelConstructors) {
+                        if (!tiles[x]) console.error(obj, 'Grid object definition incomplete: Missing "x = ' + x + '" tiles!!');
+                    }
+                    // Insert tiles
+                    for (var y = 0; y < base.grid.size.y; y++) {
+                        // Verify tiles
+                        if (bt.debugging.model.verifyModelConstructors) {
+                            if (!tiles[x][y]) console.error(obj, 'Grid object definition incomplete: Missing "x = ' + x + '" tiles!!');
+                        }
+
+                        // Insert tiles
+                        var tileDefinition = tiles[x][y].tile;
+                        angular.extend(tileDefinition, { location: { x : x , y : y } });
+                        var tile = new bt.model.definitions.battle.tile(tileDefinition);
+                        base.grid.addTile(tile);
+
+                    }
+                }
+            },
+
+            // Initializes battle view's units from BattleService.init_state() response
+            initializeUnits : function(obj) {
+                // Verify units
+                if (bt.debugging.model.verifyModelConstructors) {
+                    if ((!angular.isDefined(obj.initial_state)) || (!angular.isDefined(obj.initial_state.units))) console.error(obj, 'Grid object definition incomplete: Missing grid!');
+                }
+                // Initialize units collection
+                base.units = new bt.model.definitions.battle.unitsCollection();
+                // Insert units
+                for (var id in obj.initial_state.units) {
+                    for (var unitType in bt.model.common.units.definitions) {
+                        if (angular.isDefined(obj.initial_state.units[id][bt.model.common.units.definitions[unitType]])) {
+
+                            // Insert unit
+                            var unitDefinition = obj.initial_state.units[id][bt.model.common.units.definitions[unitType]];
+                            angular.extend(unitDefinition, { id : id });
+                            if ((angular.isDefined(obj.initial_state.owners)) && (angular.isDefined(obj.initial_state.owners[id]))) angular.extend(unitDefinition, { owner : obj.initial_state.owners[id] });
+                            var unit = new bt.model.definitions.battle[unitType](unitDefinition);
+                            base.units.addUnit(unit);
+
+                        }
+                    }
+                }
+            }
+
+        }
+        this.initialState.initialize(obj);
+
     }
 
 
 /*
-
-    function Grid(grid) {
-        "use strict";
-        Stone.call(this, copy_comp(grid.comp));
-        this.x = grid.x;
-        this.y = grid.y;
-        this.size = [this.x, this.y];
-        //convert tiles and contents.
-        var tiles = [];
-        for (var i in _.range(this.x)) {
-            tiles[i] = [];
-            for (var j in _.range(this.y)) {
-                var tcomp = copy_comp(grid.tiles[i][j].tile.comp);
-                var contents = null;
-                try {
-                    contents = new Scient(grid.tiles[i][j].tile.contents.scient);
-                } catch (e) {}
-                tiles[i][j] = new Tile(tcomp, contents);
-            }
-        }
-        this.tiles = tiles;
-    }
 
     function Battlefield(grid, init_locs, owners) {
         "use strict";
