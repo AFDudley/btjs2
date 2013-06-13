@@ -55,6 +55,19 @@ bt.services.battleService = app.factory('BattleService', function (jsonRpc) {
 });
 
 
+// Custom events definitions
+// ---------------------------------------------------------------------------------------------------------------------
+
+// @ bt.services.battleService
+
+// "Service call successfull" event
+bt.events.define(bt.services.battleService, 'Called');
+// "Service call error" event
+bt.events.define(bt.services.battleService, 'Error');
+// "Service call successfull" event
+bt.events.define(bt.services.battleService, 'Updated');
+
+
 // Initialize 'battle view' game functionality
 // ---------------------------------------------------------------------------------------------------------------------
 bt.game.battle = {
@@ -86,12 +99,16 @@ bt.game.battle = {
                     // Start timer interval
                     if (bt.game.battle.timers._interval) clearInterval(bt.game.battle.timers._interval);
                     bt.game.battle.timers._interval = setInterval(bt.game.battle.timers.update, 1000);
+                    // Initialize model-view
+                    bt.game.battle.model.initialization.initialize();
             },
         // On view unload
         // TODO: Set interval inside Angular context
         onUnload : function() {
                     // Stop timer interval
                     if (bt.game.battle.timers._interval) clearInterval(bt.game.battle.timers._interval);
+                    // Destroy model-view
+                    bt.game.battle.model.initialization.destroy();
             }
     },
     
@@ -187,15 +204,50 @@ bt.game.battle = {
 
 }
 
-
-// Custom events definitions
+// Initialize 'battle view' model-view
 // ---------------------------------------------------------------------------------------------------------------------
+bt.game.battle.model = {
 
-// @ bt.services.battleService
+    // Battle view's view-model's initialization namespace
+    initialization : {
 
-// "Service call successfull" event
-bt.events.define(bt.services.battleService, 'Called');
-// "Service call error" event
-bt.events.define(bt.services.battleService, 'Error');
-// "Service call successfull" event
-bt.events.define(bt.services.battleService, 'Updated');
+        // Initializes view-model
+        initialize : function() {
+
+            // Get initial state
+            bt.services.execute('BattleService', function(service) {
+                service.initialState(
+                    // On successfull load callback
+                    function(data) {
+                        // Fire event
+                        bt.services.battleService.Error.dispatch({
+                            message: 'Response from "BattleService.init_state().',
+                            data : data
+                        });
+                        // Initialize view-model's battleField from response
+                        bt.game.battle.model.battleField = new bt.model.definitions.battle.battleField(data);
+                    },
+                    // On error callback
+                    function(data) {
+                        // Fire event
+                        bt.services.battleService.Error.dispatch({
+                            message: 'Error calling "BattleService.init_state()"!',
+                            data : data
+                        });
+                    }
+                );
+            });
+
+        },
+
+        // Destroys view-model
+        destroy : function() {
+            delete bt.game.battle.model.battleField;
+        }
+
+    },
+
+    // Holds reference to battle view's battleField model
+    battleField : null
+
+}

@@ -83,6 +83,19 @@ bt.services.authenticationService = app.factory('AuthenticationService', functio
     });
 
 
+// Custom events definitions
+// ---------------------------------------------------------------------------------------------------------------------
+
+// @ bt.services.authService
+
+// "Authentication successfull" event
+bt.events.define(bt.services.authenticationService, 'authenticationSuccessfull');
+// "Authentication failed" event (Fired when server invalidates authentication)
+bt.events.define(bt.services.authenticationService, 'authenticationFailed');
+// "Authentication error" event (Fired on authentication request error)
+bt.events.define(bt.services.authenticationService, 'authenticationError');
+
+
 // Initialize common game functionality
 // ---------------------------------------------------------------------------------------------------------------------
 bt.game.authentication = {
@@ -107,16 +120,3 @@ bt.game.authentication = {
     }
 
 }
-
-
-// Custom events definitions
-// ---------------------------------------------------------------------------------------------------------------------
-
-// @ bt.services.authService
-
-// "Authentication successfull" event
-bt.events.define(bt.services.authenticationService, 'authenticationSuccessfull');
-// "Authentication failed" event (Fired when server invalidates authentication)
-bt.events.define(bt.services.authenticationService, 'authenticationFailed');
-// "Authentication error" event (Fired on authentication request error)
-bt.events.define(bt.services.authenticationService, 'authenticationError');

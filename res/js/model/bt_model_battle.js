@@ -169,6 +169,19 @@ bt.model.definitions.battle = {
         if (obj) bt.model.extend(this, [new bt.model.definitions.battle.localized(obj), new bt.model.definitions.battle.cStone(obj)]);
         // Initialize children
         this.contents = [ ];
+
+        // Adds content to tile
+        this.addContent = function(content) {
+                this.contents.push(content);
+            };
+        // Removes content from tile
+        this.removedContent = function(content) {
+                for (var i in this.contents) if (this.contents[i] == content) this.contents[i] = null;
+            };
+        // Clears all title's content
+        this.clearContent = function(content) {
+                this.contents = [ ];
+            };
     },
 
     // Grid definition
@@ -210,13 +223,13 @@ bt.model.definitions.battle = {
             // Initializes battle field from BattleService.init_state() response
             initialize : function(obj) {
                 // Initialize grid
-                this.initializeGrid(obj);
+                this._initializeGrid(obj);
                 // Initialize units
-                this.initializeUnits(obj);
+                this._initializeUnits(obj);
             },
 
             // Initializes battle field's grid from BattleService.init_state() response
-            initializeGrid : function(obj) {
+            _initializeGrid : function(obj) {
                 // Verify grid
                 if (bt.debugging.model.verifyModelConstructors) {
                     if ((!angular.isDefined(obj.initial_state)) || (!angular.isDefined(obj.initial_state.grid)) || (!angular.isDefined(obj.initial_state.grid.grid)) || (!angular.isDefined(obj.initial_state.grid.grid.tiles))) console.error(obj, 'Grid object definition incomplete: Missing grid!');
@@ -248,7 +261,7 @@ bt.model.definitions.battle = {
             },
 
             // Initializes battle view's units from BattleService.init_state() response
-            initializeUnits : function(obj) {
+            _initializeUnits : function(obj) {
                 // Verify units
                 if (bt.debugging.model.verifyModelConstructors) {
                     if ((!angular.isDefined(obj.initial_state)) || (!angular.isDefined(obj.initial_state.units))) console.error(obj, 'Grid object definition incomplete: Missing grid!');
@@ -266,6 +279,9 @@ bt.model.definitions.battle = {
                             if ((angular.isDefined(obj.initial_state.owners)) && (angular.isDefined(obj.initial_state.owners[id]))) angular.extend(unitDefinition, { owner : obj.initial_state.owners[id] });
                             var unit = new bt.model.definitions.battle[unitType](unitDefinition);
                             base.units.addUnit(unit);
+
+                            // Add to grid
+                            if (base.grid) base.grid.tilesByX[unit.location.x][unit.location.y].addContent(unit);
 
                         }
                     }
