@@ -10,10 +10,60 @@
     </div>
     
     <p>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.<br/>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.<br/>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.<br/>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.<br/>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.<br/>
+
+        <div class="grid">
+            <div class="grid_row" ng-repeat=" tileRow in bt.game.battle.model.battleField.grid.tilesByY ">
+                <div class="tile" ng-repeat=" tile in tileRow ">
+
+                    <div ng-if=" tile.contents.length ">
+                        <div class="unit"></div>
+                    </div>
+
+                    <div class="info">
+                        <div class="header">Tile @ {{ tile.location.x }}x{{ tile.location.y }}</div>
+                        <div class="details">
+                            <div class="title">Composition:</div>
+                            <div class="detail">Fire: {{ tile.comp.Fire }}</div>
+                            <div class="detail">Earth: {{ tile.comp.Earth }}</div>
+                            <div class="detail">Ice: {{ tile.comp.Ice }}</div>
+                            <div class="detail">Wind: {{ tile.comp.Wind }}</div>
+                        </div>
+                        <div class="details" ng-repeat=" unit in tile.contents ">
+                            <div class="title">Unit: {{ unit.name }}</div>
+                            <div class="detail">Type: {{ unit._type }}</div>
+                            <div class="detail">Owner: {{ unit.owner }}</div>
+                            <div class="detail">Sex: {{ unit.sex }}</div>
+                            <div class="detail">Composition: E:{{ unit.comp.Earth }} F:{{ unit.comp.Fire }} I:{{ unit.comp.Ice }} W:{{ unit.comp.Wind }}</div>
+                            <div class="detail">Element: {{ unit.element }}</div>
+                            <div class="details">
+                                <div class="title">Stats:</div>
+                                <div class="detail">Value: {{ unit.general.value }}</div>
+                                <div class="detail">Attack: {{ unit.general.attack }}</div>
+                                <div class="detail">Defense: {{ unit.general.defense }}</div>
+                                <div class="detail">Magic value: {{ unit.magic.value }}</div>
+                                <div class="detail">Magic attack: {{ unit.magic.attack }}</div>
+                                <div class="detail">Magic defense: {{ unit.magic.defense }}</div>
+                                <div class="detail">Physical value: {{ unit.physical.value }}</div>
+                                <div class="detail">Physical attack: {{ unit.physical.attack }}</div>
+                                <div class="detail">Physical defense: {{ unit.physical.defense }}</div>
+                            </div>
+                            <div class="details">
+                                <div class="title">Weapon: {{ unit.weapon._type }}</div>
+                                <div class="detail">Element: {{ unit.weapon._dStone.element }}</div>
+                                <div class="detail">Composition: E:{{ unit.weapon._dStone.comp.Earth }} F:{{ unit.weapon._dStone.comp.Fire }} I:{{ unit.weapon._dStone.comp.Ice }} W:{{ unit.weapon._dStone.comp.Wind }}</div>
+                            </div>
+                            <div class="details">
+                                <div class="title">Weapon bonus:</div>
+                                <div class="detail">Composition: E:{{ unit.weaponBonus._dStone.comp.Earth }} F:{{ unit.weaponBonus._dStone.comp.Fire }} I:{{ unit.weaponBonus._dStone.comp.Ice }} W:{{ unit.weaponBonus._dStone.comp.Wind }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+        <div style="clear: both;"></div>
+
     </p>
 </div>

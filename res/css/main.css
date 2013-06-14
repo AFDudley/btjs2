@@ -77,19 +77,19 @@ div.menu {
     margin: 10px 0px 0px 0px;
     padding: 4px;
 }
-div.menu div.link {
-    float: left;
-    margin: 0px 4px 0px 0px;
-}
-div.menu div.link a {
-    padding: 5px;
-    cursor: pointer;
-    border: 1px solid #444444;
-}
-div.menu div.link:hover a {
-    padding: 4px;
-    border: 2px solid #444444;
-}
+    div.menu div.link {
+        float: left;
+        margin: 0px 4px 0px 0px;
+    }
+        div.menu div.link a {
+            padding: 5px;
+            cursor: pointer;
+            border: 1px solid #444444;
+        }
+        div.menu div.link:hover a {
+            padding: 4px;
+            border: 2px solid #444444;
+        }
 
 /* Battle view markup (TEMP)
  * ---------------------------------------------------------------------------------------------------------------------- */
@@ -100,6 +100,83 @@ div.timers {
     padding: 4px;
     border: 1px solid #444444;
 }
-div.timer {
-    color: #990000;
+    div.timers div.timer {
+        color: #990000;
+    }
+
+div.grid {
+    float: left;
 }
+    div.grid div.grid_row {
+        clear: both;
+        float: left;
+    }
+    div.grid div.grid_row:nth-child(odd) {
+        margin-left:  23px;
+    }
+
+        div.grid div.grid_row div.tile {
+            float: left;
+            width: 44px;
+            height: 44px;
+            margin-bottom: -8px;
+            margin-right: 0px;
+
+            background: url('../graphics/battle/tile.png') top left no-repeat;
+            cursor: pointer;
+            font-size: 9px;
+        }
+        div.grid div.grid_row div.tile:hover {
+            background-position: bottom left;
+        }
+
+            div.grid div.grid_row div.tile div.unit {
+                float: left;
+                width: 32px;
+                height: 38px;
+
+                margin-left: 6px;
+                margin-top: -8px;
+
+                background: url('../graphics/battle/ofzza.gif') top left no-repeat;
+            }
+
+            div.grid div.grid_row div.tile div.info {
+                position: relative;
+                display: none;
+                float: left;
+                left: 48px;
+                top: 48px;
+                padding: 2px;
+
+                border: 1px solid #444444;
+                background-color: #ffffff;
+            }
+            div.grid div.grid_row div.tile:hover div.info {
+                display: block;
+                width: 200px;
+            }
+                div.grid div.grid_row div.tile:hover div.info div.header {
+                    clear: both;
+                    float: left;
+                    font-size: 11px;
+                    text-decoration: bold;
+                }
+                div.grid div.grid_row div.tile:hover div.info div.details {
+                    clear: both;
+                    float: left;
+                    margin-top: 8px;
+                    margin-left: 10px;
+                }
+                    div.grid div.grid_row div.tile:hover div.info div.details div.title {
+                        clear: both;
+                        float: left;
+                        font-size: 9px;
+                        margin-bottom: 2px;
+                        text-decoration: underline;
+                    }
+                    div.grid div.grid_row div.tile:hover div.info div.details div.detail {
+                        clear: both;
+                        float: left;
+                        font-size: 9px;
+                    }

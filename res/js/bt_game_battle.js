@@ -67,6 +67,10 @@ bt.events.define(bt.services.battleService, 'Error');
 // "Service call successfull" event
 bt.events.define(bt.services.battleService, 'Updated');
 
+// "Battle field initialized" event
+bt.events.define(bt.services.battleService, 'BattleFieldInitialized');
+// "Battle field updated" event
+bt.events.define(bt.services.battleService, 'BattleFieldUpdated');
 
 // Initialize 'battle view' game functionality
 // ---------------------------------------------------------------------------------------------------------------------
@@ -151,27 +155,18 @@ bt.game.battle = {
                                                                                         bt.game.battle.timers._playTime = bt.game.battle.timers._parseServerTime(data.ply);
                                                                                         bt.game.battle.timers._lastQueryTime = new Date();
                                                                                         // Fire event
-                                                                                        bt.services.battleService.Called.dispatch({
-                                                                                                                                    message: 'Response from "BattleService.timeLeft()".',
-                                                                                                                                    data : data
-                                                                                                                                });
+                                                                                        bt.services.battleService.Called.dispatch({ message: 'Response from "BattleService.timeLeft()".', data : data });
                                                                                         // Update timers
                                                                                         bt.game.battle.timers.update();
                                                                                     } else {
                                                                                         // Fire event
-                                                                                        bt.services.battleService.Error.dispatch({
-                                                                                                                                    message: 'Error calling "BattleService.timeLeft()"!',
-                                                                                                                                    data : data
-                                                                                                                                });
+                                                                                        bt.services.battleService.Error.dispatch({ message: 'Error calling "BattleService.timeLeft()"!', data : data });
                                                                                     }
                                                                                 },
                                                                             // Fail callback
                                                                             function(data) {
                                                                                     // Fire event
-                                                                                    bt.services.battleService.Error.dispatch({
-                                                                                                                                message: 'Error calling "BattleService.timeLeft()"!',
-                                                                                                                                data : data
-                                                                                                                            });
+                                                                                    bt.services.battleService.Error.dispatch({ message: 'Error calling "BattleService.timeLeft()"!', data : data });
                                                                                 }
                                                                         );
                                                     });
@@ -219,21 +214,17 @@ bt.game.battle.model = {
                 service.initialState(
                     // On successfull load callback
                     function(data) {
-                        // Fire event
-                        bt.services.battleService.Error.dispatch({
-                            message: 'Response from "BattleService.init_state().',
-                            data : data
-                        });
+                        // Fire events
+                        bt.services.battleService.Called.dispatch({ message: 'Response from "BattleService.init_state().', data : data });
+                        bt.services.battleService.BattleFieldInitialized.dispatch({ message: 'Response from "BattleService.init_state().', data : data });
+                        bt.services.battleService.BattleFieldUpdated.dispatch({ message: 'Response from "BattleService.init_state().', data : data });
                         // Initialize view-model's battleField from response
                         bt.game.battle.model.battleField = new bt.model.definitions.battle.battleField(data);
                     },
                     // On error callback
                     function(data) {
-                        // Fire event
-                        bt.services.battleService.Error.dispatch({
-                            message: 'Error calling "BattleService.init_state()"!',
-                            data : data
-                        });
+                        // Fire events
+                        bt.services.battleService.Error.dispatch({ message: 'Error calling "BattleService.init_state()"!', data : data });
                     }
                 );
             });

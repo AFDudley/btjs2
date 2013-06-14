@@ -46,8 +46,8 @@ bt.model.definitions.battle = {
         // Extend location from passed object
         if ((angular.isDefined(obj.location)) && (obj.location.length == 2)) {
             this.location = {
-                x : obj.location[0],
-                y : obj.location[1]
+                x : obj.location[1],
+                y : obj.location[0]
             }
         } else if ((angular.isDefined(obj.location)) && (angular.isDefined(obj.location.x)) && (angular.isDefined(obj.location.y))) {
             this.location = {
