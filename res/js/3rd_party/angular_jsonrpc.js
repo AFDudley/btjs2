@@ -3,7 +3,7 @@ angular.module('angular-json-rpc', []);
 // json rpc for angular js. JSON-RPC-2.0 compatible.
 // spec - http://www.jsonrpc.org/specification
 //
-var jsonRpc = angular.module('angular-json-rpc', []).factory("jsonRpc", ['$http', function($http) {
+var jsonRpc = angular.module('angular-json-rpc', []).factory("$jsonRpc", ['$http', function($http) {
 	this.version = "2.0";
 
 	var jsonRpcBase = this;
@@ -61,9 +61,9 @@ var jsonRpc = angular.module('angular-json-rpc', []).factory("jsonRpc", ['$http'
 	//
 	// json-recp request method definition
 	//
-	this.method = function(name, parameters, onSuccess, onFail, onError) {
+	this.method = function(name) {
 		// Define method call
-		var methodCall = function(onSuccess, onFail, onError) {
+		var methodCall = function(parameters, onSuccess, onFail, onError) {
 								jsonRpcBase.request(
 											name,
 											{ params : parameters },

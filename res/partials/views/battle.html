@@ -2,13 +2,21 @@
     <h2>BATTLE VIEW !!!</h2>
     Controller: {{ controllerName }}
     <br/><br/>
-    
-    <div class="timers">
-        <h3>Timers:</h3>
-        <div class="timer"> {{ bt.game.battle.timers.battleTime }} </div>
-        <div class="timer"> {{ bt.game.battle.timers.playTime }} </div>
+
+    <div class="toolbox">
+        <div class="timers">
+            <h3>Timers:</h3>
+            <div class="timer"> {{ bt.game.battle.timers.battleTime }} </div>
+            <div class="timer"> {{ bt.game.battle.timers.playTime }} </div>
+        </div>
+
+        <div class="selected" ng-if=" bt.game.battle.model.battleField.selectedTile ">
+            <div ng-repeat=" unit in bt.game.battle.model.battleField.selectedTile.contents ">
+                <div >Unit: {{ unit.name }} / {{ unit.id }}</div>
+            </div>
+        </div>
     </div>
-    
+
     <p>
 
         <div class="grid">
@@ -16,7 +24,7 @@
                 <div class="tile" ng-repeat=" tile in tileRow ">
 
                     <div ng-if=" tile.contents.length ">
-                        <div class="unit"></div>
+                        <div class="unit" ng-click=" bt.game.battle.model.battleField.selectTile(tile) "></div>
                     </div>
 
                     <div class="info">
@@ -29,7 +37,7 @@
                             <div class="detail">Wind: {{ tile.comp.Wind }}</div>
                         </div>
                         <div class="details" ng-repeat=" unit in tile.contents ">
-                            <div class="title">Unit: {{ unit.name }}</div>
+                            <div class="title">Unit: {{ unit.name }} / {{ unit.id }}</div>
                             <div class="detail">Type: {{ unit._type }}</div>
                             <div class="detail">Owner: {{ unit.owner }}</div>
                             <div class="detail">Sex: {{ unit.sex }}</div>

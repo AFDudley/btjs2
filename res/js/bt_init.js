@@ -34,7 +34,7 @@ var btView = function(obj) {
 
 // Initialize main game module
 // ---------------------------------------------------------------------------------------------------------------------
-var app = angular.module('bt', ['angular-json-rpc']);
+var app = angular.module('bt', ['angular-json-rpc', 'angular-interval']);
 
 // Main application namespace
 // ---------------------------------------------------------------------------------------------------------------------
@@ -126,10 +126,10 @@ var bt = {
             /* Filled implicitly from other JS scripts */
         
             // Takes a service name reference and function with initialted service for argument and executes function over service
-            execute : function (service, fn) {
+            execute : function (service, fn, apply) {
                 if (typeof service == 'string') service = angular.element(document.body).injector().get(service);
                 fn(service);
-                angular.element(document.body).scope().$apply();                
+                if (apply) angular.element(document.body).scope().$apply();
             }
             
         },

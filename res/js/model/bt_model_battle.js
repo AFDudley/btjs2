@@ -46,8 +46,8 @@ bt.model.definitions.battle = {
         // Extend location from passed object
         if ((angular.isDefined(obj.location)) && (obj.location.length == 2)) {
             this.location = {
-                x : obj.location[1],
-                y : obj.location[0]
+                x : obj.location[0],
+                y : obj.location[1]
             }
         } else if ((angular.isDefined(obj.location)) && (angular.isDefined(obj.location.x)) && (angular.isDefined(obj.location.y))) {
             this.location = {
@@ -290,6 +290,16 @@ bt.model.definitions.battle = {
 
         }
         this.initialState.initialize(obj);
+
+        // UI interaction
+        // ---------------------------------------------------------
+
+        // Holds reference to selected tile
+        this.selectedTile = null;
+        // Sets tile as selected
+        this.selectTile = function(tile) {
+            this.selectedTile = tile;
+        };
 
     }
 

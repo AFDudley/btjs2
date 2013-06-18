@@ -19,5 +19,5 @@ bt.config.urls = {
 bt.config.poling.minimalIntervalBetweenPolls = 2000;
 
 // Set debugging options
-bt.debugging.events.publishToConsole = true;
+bt.debugging.events.publishToConsole = false;
 bt.debugging.model.verifyModelConstructors = true;

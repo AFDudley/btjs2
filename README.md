@@ -34,43 +34,43 @@ And then you can inspect the initialized view-model's battleField object with:
 
 ```javascript
     bt.services.execute('BattleService', function(service) {
-                                            service.getUsername(
+                                            service.calls.getUsername(
                                                                 function(data) { console.log("Success:"); console.log(data); },
                                                                 function(data) { console.log("Fail:"); console.log(data); }
                                                             );
                                         });
     bt.services.execute('BattleService', function(service) {
-                                            service.timeLeft(
+                                            service.calls.timeLeft(
                                                                 function(data) { console.log("Success:"); console.log(data); },
                                                                 function(data) { console.log("Fail:"); console.log(data); }
                                                             );
                                         });
     bt.services.execute('BattleService', function(service) {
-                                            service.initialState(
+                                            service.calls.initialState(
                                                                 function(data) { console.log("Success:"); console.log(data); },
                                                                 function(data) { console.log("Fail:"); console.log(data); }
                                                             );
                                         });
     bt.services.execute('BattleService', function(service) {
-                                            service.lastResult(
+                                            service.calls.lastResult(
                                                                 function(data) { console.log("Success:"); console.log(data); },
                                                                 function(data) { console.log("Fail:"); console.log(data); }
                                                             );
                                         });
     bt.services.execute('BattleService', function(service) {
-                                            service.getStates(
+                                            service.calls.getStates(
                                                                 function(data) { console.log("Success:"); console.log(data); },
                                                                 function(data) { console.log("Fail:"); console.log(data); }
                                                             );
                                         });
     bt.services.execute('BattleService', function(service) {
-                                            service.getLastState(
+                                            service.calls.getLastState(
                                                                 function(data) { console.log("Success:"); console.log(data); },
                                                                 function(data) { console.log("Fail:"); console.log(data); }
                                                             );
                                         });
     bt.services.execute('BattleService', function(service) {
-                                            service.processAction(
+                                            service.calls.processAction(
                                                                 'action type',
                                                                 function(data) { console.log("Success:"); console.log(data); },
                                                                 function(data) { console.log("Fail:"); console.log(data); }

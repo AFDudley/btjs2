@@ -94,21 +94,35 @@ div.menu {
 /* Battle view markup (TEMP)
  * ---------------------------------------------------------------------------------------------------------------------- */
 
-div.timers {
+div.toolbox {
+    float: right;
+}
+
+div.toolbox div.timers {
+    clear: right;
     float: right;
     margin: 4px 10px 4px 10px;
     padding: 4px;
     border: 1px solid #444444;
 }
-    div.timers div.timer {
+    div.toolbox div.timers div.timer {
         color: #990000;
     }
+
+div.toolbox div.selected {
+    clear: right;
+    float: right;
+    margin: 4px 10px 4px 10px;
+    padding: 4px;
+    border: 1px solid #444444;
+}
+
 
 div.grid {
     float: left;
 }
     div.grid div.grid_row {
-        clear: both;
+        clear: left;
         float: left;
     }
     div.grid div.grid_row:nth-child(odd) {
