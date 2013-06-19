@@ -10,8 +10,8 @@
             <div class="timer"> {{ bt.game.battle.timers.playTime }} </div>
         </div>
 
-        <div class="selected" ng-if=" bt.game.battle.model.battleField.selectedTile ">
-            <div ng-repeat=" unit in bt.game.battle.model.battleField.selectedTile.contents ">
+        <div class="selected" ng-if=" bt.game.battle.model.battleField.grid.selectedTile ">
+            <div ng-repeat=" unit in bt.game.battle.model.battleField.grid.selectedTile.contents ">
                 <div >Unit: {{ unit.name }} / {{ unit.id }}</div>
             </div>
         </div>
@@ -21,10 +21,13 @@
 
         <div class="grid">
             <div class="grid_row" ng-repeat=" tileRow in bt.game.battle.model.battleField.grid.tilesByY ">
-                <div class="tile" ng-repeat=" tile in tileRow ">
+                <div class="tile" ng-repeat=" tile in tileRow " ng-click=" bt.game.battle.model.battleField.grid.processTileClick(tile) ">
+                    <div class="tile_style {{ tile.style }}">
 
-                    <div ng-if=" tile.contents.length ">
-                        <div class="unit" ng-click=" bt.game.battle.model.battleField.selectTile(tile) "></div>
+                        <div ng-if=" tile.contents.length ">
+                            <div class="unit"></div>
+                        </div>
+
                     </div>
 
                     <div class="info">
@@ -66,7 +69,6 @@
                             </div>
                         </div>
                     </div>
-
 
                 </div>
             </div>

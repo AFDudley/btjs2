@@ -182,10 +182,20 @@ bt.model.definitions.battle = {
         this.clearContent = function(content) {
                 this.contents = [ ];
             };
+
+        this.isOwnedByPlayer = function() {
+            return (this.contents.length == 0 ? false : (this.contents[0].owner == bt.game.authentication.username));
+        }
     },
 
     // Grid definition
     grid : function(obj) {
+
+        // Initialization
+        // ---------------------------------------------------------
+
+        var base = this;
+
         // Extend pased object
         if (obj) bt.model.extend(this, [new bt.model.definitions.battle.cStone(obj)]);
         // Verify children
@@ -207,6 +217,96 @@ bt.model.definitions.battle = {
             if (!angular.isDefined(this.tilesByY[tile.location.y])) this.tilesByY[tile.location.y] = [];
             this.tilesByY[tile.location.y][tile.location.x] = tile;
         }
+
+        // Tiles selection
+        // ---------------------------------------------------------
+
+        // Gets all neighbouring tiles with distances from source less than radius and with no units in the way
+        this.getNeighourTiles = function(sourceTile, radius, result) {
+            // Initialize result
+            if (!result) result = { };
+            // Get neighbouring tiles
+            var neighbouringTiles = [
+                            { x : sourceTile.location.x - 1, y : sourceTile.location.y },
+                            { x : sourceTile.location.x + 1, y : sourceTile.location.y },
+                            { x : sourceTile.location.x + (sourceTile.location.y % 2 == 1 ? 0 : -1), y : sourceTile.location.y - 1 },
+                            { x : sourceTile.location.x + (sourceTile.location.y % 2 == 1 ? 0 : -1) + 1, y : sourceTile.location.y - 1 },
+                            { x : sourceTile.location.x + (sourceTile.location.y % 2 == 1 ? 0 : -1), y : sourceTile.location.y + 1 },
+                            { x : sourceTile.location.x + (sourceTile.location.y % 2 == 1 ? 0 : -1) + 1, y : sourceTile.location.y + 1 }
+                        ];
+            // Get source radius
+            var sourceTileId = sourceTile.location.x + 'x' + sourceTile.location.y;
+            var sourceRadius = (result[sourceTileId] ? result[sourceTileId].radius : 0);
+            // Process neighbouring tiles
+            for (var i in neighbouringTiles) {
+                var neighbouringTile = neighbouringTiles[i];
+                var neighbouringTileId = neighbouringTile.x + 'x' + neighbouringTile.y;
+                if ((base.tilesByX[neighbouringTile.x]) && (base.tilesByX[neighbouringTile.x][neighbouringTile.y]) && ((!result[neighbouringTileId]) || (result[neighbouringTileId].radius > (sourceRadius + 1)))) {
+                    // Add tile to result
+                    var resultTile = base.tilesByX[neighbouringTile.x][neighbouringTile.y];
+                    result[neighbouringTileId] = { radius : sourceRadius + 1, tile : resultTile };
+                    // Process further neighbours
+                    if ((radius > 1) && (resultTile.contents.length == 0)) base.getNeighourTiles(resultTile, (radius - 1), result);
+                }
+            }
+            // Return result
+            return result;
+        }
+
+        // UI interpretation
+        // ---------------------------------------------------------
+
+        // Holds reference to selected tile
+        this.selectedTile = null;
+        this.processTileClick = function(tile) {
+            // Check if tile is selectable
+            if (tile.isOwnedByPlayer()) {
+                // Select tile
+                this._selectTile(tile);
+            } else if (tile.avaliableAction) {
+                // Execute tile action
+                this._executeActionOnTile(tile);
+            } else {
+                // Deselect tile
+                this._selectTile(null);
+            }
+        }
+        // Sets tile as selected
+        this._selectTile = function(tile) {
+            // Set selected tile
+            this.selectedTile = tile;
+            // Clear tiles' styles and actions
+            for (var i in this.tiles) {
+                this.tiles[i].style = null;
+                this.tiles[i].avaliableAction = null;
+            }
+            if (tile) {
+                // Set tiles' styles and actions
+                var nearTiles = base.getNeighourTiles(this.selectedTile, 4);
+                for (var i in nearTiles) {
+                    if ((nearTiles[i].tile.contents.length > 0) && (!nearTiles[i].tile.isOwnedByPlayer())) {
+                        nearTiles[i].tile.style = bt.config.game.battle.styles.attack;
+                        nearTiles[i].tile.avaliableAction = 'attack';
+                    } else if (nearTiles[i].tile.contents.length == 0) {
+                        if  (nearTiles[i].radius <= 1) {
+                            nearTiles[i].tile.style = bt.config.game.battle.styles.move_near;
+                            nearTiles[i].tile.avaliableAction = 'move';
+                        } else if (nearTiles[i] != this.selectedTile) {
+                            nearTiles[i].tile.style = bt.config.game.battle.styles.move_far;
+                            nearTiles[i].tile.avaliableAction = 'move';
+                        }
+                    }
+                }
+                this.selectedTile.style = bt.config.game.battle.styles.selected;
+            }
+        };
+        // Sets tile as selected
+        this._executeActionOnTile = function(tile) {
+            if (tile.avaliableAction) {
+                alert('Processing action "' + tile.avaliableAction + '"!');
+            }
+        };
+
     },
 
     battleField : function(obj) {
@@ -290,16 +390,6 @@ bt.model.definitions.battle = {
 
         }
         this.initialState.initialize(obj);
-
-        // UI interaction
-        // ---------------------------------------------------------
-
-        // Holds reference to selected tile
-        this.selectedTile = null;
-        // Sets tile as selected
-        this.selectTile = function(tile) {
-            this.selectedTile = tile;
-        };
 
     }
 

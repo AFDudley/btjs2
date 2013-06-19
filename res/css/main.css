@@ -125,7 +125,7 @@ div.grid {
         clear: left;
         float: left;
     }
-    div.grid div.grid_row:nth-child(odd) {
+    div.grid div.grid_row:nth-child(even) {
         margin-left:  23px;
     }
 
@@ -143,6 +143,24 @@ div.grid {
         div.grid div.grid_row div.tile:hover {
             background-position: bottom left;
         }
+
+        div.grid div.grid_row div.tile_style {
+            float: left;
+            width: 44px;
+            height: 44px;
+        }
+    div.grid div.grid_row div.tile_selected {
+        background: url('../graphics/battle/tile_selected.png') top left no-repeat;
+    }
+    div.grid div.grid_row div.tile_move_near {
+        background: url('../graphics/battle/tile_move_near.png') top left no-repeat;
+    }
+    div.grid div.grid_row div.tile_move_far {
+        background: url('../graphics/battle/tile_move_far.png') top left no-repeat;
+    }
+    div.grid div.grid_row div.tile_attack {
+        background: url('../graphics/battle/tile_attack.png') top left no-repeat;
+    }
 
             div.grid div.grid_row div.tile div.unit {
                 float: left;

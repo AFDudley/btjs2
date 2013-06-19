@@ -102,6 +102,24 @@ var bt = {
                 // Holds value for minimal time interval between polling same service in [ms]
                 minimalIntervalBetweenPolls : 2000
                 
+            },
+
+            // Game namespace
+            game : {
+
+                // Battle view namespace
+                battle : {
+
+                    // Styling namespace
+                    styles : {
+                        selected    : 'tile_selected',
+                        move_near   : 'tile_move_near',
+                        move_far    : 'tile_move_far',
+                        attack      : 'tile_attack'
+                    }
+
+                }
+
             }
             
         },
