@@ -94,28 +94,63 @@ div.menu {
 /* Battle view markup (TEMP)
  * ---------------------------------------------------------------------------------------------------------------------- */
 
+div.game_over {
+    position: fixed;
+    width: 100%;
+    height: 40%;
+    margin: 30% 0px 30% 0px;
+
+    opacity: 0.6;
+    background: #444444;
+    border-top: 1px solid #000000;
+    border-bottom: 1px solid #000000;
+
+    font-size: 18px;
+    font-weight: bold;
+}
+
 div.toolbox {
     float: right;
 }
 
-div.toolbox div.timers {
-    clear: right;
-    float: right;
-    margin: 4px 10px 4px 10px;
-    padding: 4px;
-    border: 1px solid #444444;
-}
-    div.toolbox div.timers div.timer {
-        color: #990000;
+    div.toolbox div.player {
+        clear: right;
+        float: right;
+        margin: 4px 10px 4px 10px;
+        padding: 4px;
+        border: 1px solid #444444;
+
+        font-size: 13px;
     }
 
-div.toolbox div.selected {
-    clear: right;
-    float: right;
-    margin: 4px 10px 4px 10px;
-    padding: 4px;
-    border: 1px solid #444444;
-}
+    div.toolbox div.timers {
+        clear: right;
+        float: right;
+        margin: 4px 10px 4px 10px;
+        padding: 4px;
+        border: 1px solid #444444;
+    }
+        div.toolbox div.timers div.timer {
+            color: #990000;
+        }
+        div.toolbox div.timers div.action {
+            margin: 4px;
+            color: #0000ff;
+            font-size: 11px;
+            cursor: pointer;
+        }
+        div.toolbox div.timers div.action:hover {
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+    div.toolbox div.selected {
+        clear: right;
+        float: right;
+        margin: 4px 10px 4px 10px;
+        padding: 4px;
+        border: 1px solid #444444;
+    }
 
 
 div.grid {
@@ -149,28 +184,47 @@ div.grid {
             width: 44px;
             height: 44px;
         }
+
     div.grid div.grid_row div.tile_selected {
         background: url('../graphics/battle/tile_selected.png') top left no-repeat;
     }
-    div.grid div.grid_row div.tile_move_near {
-        background: url('../graphics/battle/tile_move_near.png') top left no-repeat;
+    div.grid div.grid_row div.tile_move {
+        background: url('../graphics/battle/tile_move.png') top left no-repeat;
     }
-    div.grid div.grid_row div.tile_move_far {
-        background: url('../graphics/battle/tile_move_far.png') top left no-repeat;
+    div.grid div.grid_row div.tile_range {
+        background: url('../graphics/battle/tile_range.png') top left no-repeat;
     }
     div.grid div.grid_row div.tile_attack {
         background: url('../graphics/battle/tile_attack.png') top left no-repeat;
     }
 
             div.grid div.grid_row div.tile div.unit {
-                float: left;
-                width: 32px;
-                height: 38px;
+                position: relative;
+                width: 40px;
+                height: 40px;
+                margin: 0px -40px -40px 4px;
 
-                margin-left: 6px;
-                margin-top: -8px;
+                background-position:  center center;
+                background-repeat: no-repeat;
+            }
+                div.grid div.grid_row div.tile div.unit_player {
+                       background-image: url('../graphics/battle/unit_player.gif');
+                }
+                div.grid div.grid_row div.tile div.unit_enemy {
+                    background-image: url('../graphics/battle/unit_enemy.gif');
+                }
 
-                background: url('../graphics/battle/ofzza.gif') top left no-repeat;
+            div.grid div.grid_row div.tile div.distance {
+                position: relative;
+                width: 44px;
+                margin: 32px 0px 0px 0px;
+
+                text-align: center;
+                font-size: 9px;
+                color: #ffffff;
+            }
+            div.grid div.grid_row div.tile:hover div.distance {
+                color: #000000;
             }
 
             div.grid div.grid_row div.tile div.info {

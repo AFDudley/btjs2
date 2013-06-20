@@ -4,10 +4,15 @@
     <br/><br/>
 
     <div class="toolbox">
+        <div class="player">
+            <b>Last action by player:</b> {{ bt.game.battle.model.battleField.activePlayer }}
+        </div>
+
         <div class="timers">
             <h3>Timers:</h3>
-            <div class="timer"> {{ bt.game.battle.timers.battleTime }} </div>
-            <div class="timer"> {{ bt.game.battle.timers.playTime }} </div>
+            <div class="timer"> {{ bt.game.battle.timers.battleTimeFormated }} </div>
+            <div class="timer"> {{ bt.game.battle.timers.playTimeFormated }} </div>
+            <div class="action" ng-click=" passTurn(); ">Pass turn ...</div>
         </div>
 
         <div class="selected" ng-if=" bt.game.battle.model.battleField.grid.selectedTile ">
@@ -21,11 +26,15 @@
 
         <div class="grid">
             <div class="grid_row" ng-repeat=" tileRow in bt.game.battle.model.battleField.grid.tilesByY ">
-                <div class="tile" ng-repeat=" tile in tileRow " ng-click=" bt.game.battle.model.battleField.grid.processTileClick(tile) ">
+                <div class="tile" ng-repeat=" tile in tileRow " ng-click=" processAction(tile) ">
                     <div class="tile_style {{ tile.style }}">
 
-                        <div ng-if=" tile.contents.length ">
-                            <div class="unit"></div>
+                        <div ng-if=" tile.units['scient'].length ">
+                            <div class="unit {{ tile.units['scient'][0].style }}"></div>
+                        </div>
+
+                        <div class="distance">
+                            {{ tile.distance }}
                         </div>
 
                     </div>
@@ -48,6 +57,7 @@
                             <div class="detail">Element: {{ unit.element }}</div>
                             <div class="details">
                                 <div class="title">Stats:</div>
+                                <div class="detail">HP: {{ unit.hp }}</div>
                                 <div class="detail">Value: {{ unit.general.value }}</div>
                                 <div class="detail">Attack: {{ unit.general.attack }}</div>
                                 <div class="detail">Defense: {{ unit.general.defense }}</div>

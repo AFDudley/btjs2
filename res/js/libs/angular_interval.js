@@ -23,7 +23,10 @@ var interval = angular.module('angular-interval', []).factory("$interval", funct
     // Starts an interval action
     this.start = function(name, starting) {
         if (intervalBase._intervals[name])  {
-            if (!starting) intervalBase._intervals[name].run = true;
+            if (!starting) {
+                intervalBase._intervals[name].run = true;
+                intervalBase._intervals[name].fn();
+            }
             if (intervalBase._intervals[name].run) {
                 $timeout(intervalBase._intervals[name].fn, intervalBase._intervals[name].interval)
                         .then( function() { intervalBase.start(name, true); } );

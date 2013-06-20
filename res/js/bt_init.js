@@ -57,6 +57,16 @@ var bt = {
         
         // Configuration namespace
         config : {
+
+            // Web URLs namespace
+            urls : {
+
+                // Holds client-side URL path
+                clientUrl :     '/',
+                // Holds server-side URL path
+                servicesUrl :   '/'
+
+            },
             
             // Views configuration namespace
             views : {
@@ -110,12 +120,31 @@ var bt = {
                 // Battle view namespace
                 battle : {
 
-                    // Styling namespace
+                    // CSS Styles configuration namespace
                     styles : {
+                        // Selected tile CSS class name
                         selected    : 'tile_selected',
-                        move_near   : 'tile_move_near',
-                        move_far    : 'tile_move_far',
-                        attack      : 'tile_attack'
+                        // Selected tile CSS class name
+                        move        : 'tile_move',
+                        // Selected tile CSS class name
+                        range       : 'tile_range',
+                        // Selected tile CSS class name
+                        attack      : 'tile_attack',
+
+                        // Player's unit CSS class name
+                        player : 'player',
+                        // Enemy unit CSS class name
+                        enemy : 'enemy'
+                    },
+
+                    // Actions configuration namespace
+                    actions : {
+                        // Holds unit's move radius
+                        moveRadius : 1,
+                        // Toggles if actions and movement can pass through other units
+                        jumpUnits : true,
+                        // Toggles if player can attack his own units
+                        friendlyFire : true
                     }
 
                 }

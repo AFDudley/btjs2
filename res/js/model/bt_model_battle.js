@@ -59,6 +59,17 @@ bt.model.definitions.battle = {
         if (bt.debugging.model.verifyModelConstructors) {
             if ((!angular.isDefined(this.location)) || (!angular.isDefined(this.location.x)) || (!angular.isDefined(this.location.y))) console.error(obj, 'Localized object definition incomplete: Missing location!');
         }
+
+        // Update functionality
+        this.updateLocation = function(location) {
+            if ((angular.isArray(location)) && (location.length == 2)) {
+                this.location.x = location[0];
+                this.location.y = location[1];
+            } else if (angular.isObject(location)) {
+                this.location.x = location.x;
+                this.location.y = location.y;
+            }
+        }
     },
 
     // Weapon definition
@@ -111,6 +122,11 @@ bt.model.definitions.battle = {
             this.hp = (4 * (this.physical.defense + this.magic.defense + this.value));
         }
         this.updateStats();
+
+        // Update functionality
+        this.updateHp = function(hp) {
+            this.hp = hp;
+        }
     },
 
     // Grid definition
@@ -125,8 +141,7 @@ bt.model.definitions.battle = {
         this.addUnit = function(unit) {
             this.units.push(unit);
             if (unit.id) {
-                if (!angular.isDefined(this.unitsById[unit.id])) this.unitsById[unit.id] = [ ];
-                this.unitsById[unit.id].push(unit);
+                this.unitsById[unit.id] = unit;
             }
             if (unit.owner) {
                 if (!angular.isDefined(this.unitsByOwner[unit.owner])) this.unitsByOwner[unit.owner] = [ ];
@@ -153,6 +168,7 @@ bt.model.definitions.battle = {
         }
         // Initialize children
         this._type = bt.model.common.units.definitions.scient;
+        this.style = (this.owner == bt.game.authentication.username ? bt.config.game.battle.styles.player : bt.config.game.battle.styles.enemy);
         this.weapon = new bt.model.definitions.battle.weapon(this.weapon);
         if (angular.isDefined(this.weaponBonus)) {
             this.weaponBonus = new bt.model.definitions.battle.stone(this.weaponBonus);
@@ -169,23 +185,36 @@ bt.model.definitions.battle = {
         if (obj) bt.model.extend(this, [new bt.model.definitions.battle.localized(obj), new bt.model.definitions.battle.cStone(obj)]);
         // Initialize children
         this.contents = [ ];
+        this.units = { }
+        for (var type in bt.model.common.units.definitions) {
+            this.units[bt.model.common.units.definitions[type]] = [ ];
+        }
 
         // Adds content to tile
         this.addContent = function(content) {
                 this.contents.push(content);
+                var type = bt.model.common.units.getDefinition(content._type);
+                if (type) this.units[type].push(content);
             };
         // Removes content from tile
-        this.removedContent = function(content) {
-                for (var i in this.contents) if (this.contents[i] == content) this.contents[i] = null;
+        this.removeContent = function(content) {
+                for (var i in this.contents) if (this.contents[i] == content) this.contents.splice(i, 1);
+                var type = bt.model.common.units.getDefinition(content._type);
+                if (type) for (var i in this.units[type]) if (this.units[type][i] == content) this.units[type].splice(i, 1);
             };
         // Clears all title's content
         this.clearContent = function(content) {
                 this.contents = [ ];
+                var type = bt.model.common.units.getDefinition(content._type);
+                if (type) this.units[type] = [ ];
             };
 
         this.isOwnedByPlayer = function() {
-            return (this.contents.length == 0 ? false : (this.contents[0].owner == bt.game.authentication.username));
-        }
+            for (var i in this.contents) {
+                if (this.contents[i].owner == bt.game.authentication.username) return true;
+            }
+            return false;
+            }
     },
 
     // Grid definition
@@ -218,7 +247,7 @@ bt.model.definitions.battle = {
             this.tilesByY[tile.location.y][tile.location.x] = tile;
         }
 
-        // Tiles selection
+        // Tiles manipulation
         // ---------------------------------------------------------
 
         // Gets all neighbouring tiles with distances from source less than radius and with no units in the way
@@ -244,13 +273,30 @@ bt.model.definitions.battle = {
                 if ((base.tilesByX[neighbouringTile.x]) && (base.tilesByX[neighbouringTile.x][neighbouringTile.y]) && ((!result[neighbouringTileId]) || (result[neighbouringTileId].radius > (sourceRadius + 1)))) {
                     // Add tile to result
                     var resultTile = base.tilesByX[neighbouringTile.x][neighbouringTile.y];
-                    result[neighbouringTileId] = { radius : sourceRadius + 1, tile : resultTile };
+                    resultTile.distance = sourceRadius + 1;
+                    result[neighbouringTileId] = { radius : resultTile.distance, tile : resultTile };
                     // Process further neighbours
-                    if ((radius > 1) && (resultTile.contents.length == 0)) base.getNeighourTiles(resultTile, (radius - 1), result);
+                    if ((radius > 1) && ((bt.config.game.battle.actions.jumpUnits) || (resultTile.contents.length == 0))) base.getNeighourTiles(resultTile, (radius - 1), result);
                 }
             }
             // Return result
             return result;
+        },
+
+        // Moves content to new tile
+        this.moveContent = function(content, targetLocation) {
+            // Get content location
+            var sourceLocation = content.location;
+            // Get source and target tiles
+            var sourceTile = this.tilesByX[sourceLocation.x][sourceLocation.y];
+            var targetTile = this.tilesByX[targetLocation.x][targetLocation.y];
+            // Move content
+            if (sourceTile != targetTile) {
+                sourceTile.removeContent(content);
+                targetTile.addContent(content);
+                if (this.selectedTile == sourceTile) this._selectTile(targetTile);
+                content.updateLocation(targetLocation);
+            }
         }
 
         // UI interpretation
@@ -258,14 +304,19 @@ bt.model.definitions.battle = {
 
         // Holds reference to selected tile
         this.selectedTile = null;
-        this.processTileClick = function(tile) {
+        this.processTileClick = function(battleService, tile) {
             // Check if tile is selectable
-            if (tile.isOwnedByPlayer()) {
-                // Select tile
-                this._selectTile(tile);
-            } else if (tile.avaliableAction) {
+            if (tile.avaliableAction) {
                 // Execute tile action
-                this._executeActionOnTile(tile);
+                this._executeActionOnTile(battleService, tile);
+            } else if (tile.isOwnedByPlayer()) {
+                if (tile != this.selectedTile) {
+                    // Select tile
+                    this._selectTile(tile);
+                } else {
+                    // Deselect tile
+                    this._selectTile(null);
+                }
             } else {
                 // Deselect tile
                 this._selectTile(null);
@@ -273,37 +324,57 @@ bt.model.definitions.battle = {
         }
         // Sets tile as selected
         this._selectTile = function(tile) {
-            // Set selected tile
-            this.selectedTile = tile;
             // Clear tiles' styles and actions
             for (var i in this.tiles) {
                 this.tiles[i].style = null;
                 this.tiles[i].avaliableAction = null;
+                this.tiles[i].distance = null;
             }
+            // Set selected tile
+            this.selectedTile = tile;
             if (tile) {
-                // Set tiles' styles and actions
-                var nearTiles = base.getNeighourTiles(this.selectedTile, 4);
-                for (var i in nearTiles) {
-                    if ((nearTiles[i].tile.contents.length > 0) && (!nearTiles[i].tile.isOwnedByPlayer())) {
-                        nearTiles[i].tile.style = bt.config.game.battle.styles.attack;
-                        nearTiles[i].tile.avaliableAction = 'attack';
-                    } else if (nearTiles[i].tile.contents.length == 0) {
-                        if  (nearTiles[i].radius <= 1) {
-                            nearTiles[i].tile.style = bt.config.game.battle.styles.move_near;
-                            nearTiles[i].tile.avaliableAction = 'move';
-                        } else if (nearTiles[i] != this.selectedTile) {
-                            nearTiles[i].tile.style = bt.config.game.battle.styles.move_far;
-                            nearTiles[i].tile.avaliableAction = 'move';
+                // Calculate weapon attack radius
+                var units = this.selectedTile.units[bt.model.common.units.definitions.scient];
+                if (units.length > 0) {
+                    var unit = units[0];
+                    var weapon = unit.weapon;
+                    if (weapon) {
+                        var attackRadius = bt.model.common.weapons.getRange(weapon._type);
+                        if (attackRadius) {
+                            var minAttackRadius = attackRadius.min, maxAttackRadius = attackRadius.max;
+
+                            // Set tiles' styles and actions
+                            var nearTiles = base.getNeighourTiles(this.selectedTile, (maxAttackRadius > bt.config.game.battle.actions.moveRadius ? maxAttackRadius : bt.config.game.battle.actions.moveRadius));
+                            for (var i in nearTiles) {
+                                if ((nearTiles[i].tile != this.selectedTile)
+                                    &&((nearTiles[i].tile.units[bt.model.common.units.definitions.scient].length > 0)
+                                    && ((bt.config.game.battle.actions.friendlyFire) || (!nearTiles[i].tile.isOwnedByPlayer())))
+                                    && ((nearTiles[i].radius >= minAttackRadius) && (nearTiles[i].radius <= maxAttackRadius))) {
+                                    nearTiles[i].tile.style = bt.config.game.battle.styles.attack;
+                                    nearTiles[i].tile.avaliableAction = 'attack';
+                                } else if (nearTiles[i].tile.units[bt.model.common.units.definitions.scient].length == 0) {
+                                    if  (nearTiles[i].radius <= bt.config.game.battle.actions.moveRadius) {
+                                        nearTiles[i].tile.style = bt.config.game.battle.styles.move;
+                                        nearTiles[i].tile.avaliableAction = 'move';
+                                    } else if ((nearTiles[i] != this.selectedTile) && (nearTiles[i].radius >= minAttackRadius) && ((nearTiles[i].radius <= maxAttackRadius))) {
+                                        nearTiles[i].tile.style = bt.config.game.battle.styles.range;
+                                    }
+                                }
+                            }
+                            this.selectedTile.style = bt.config.game.battle.styles.selected;
                         }
                     }
                 }
-                this.selectedTile.style = bt.config.game.battle.styles.selected;
             }
         };
         // Sets tile as selected
-        this._executeActionOnTile = function(tile) {
+        this._executeActionOnTile = function(battleService, tile) {
             if (tile.avaliableAction) {
-                alert('Processing action "' + tile.avaliableAction + '"!');
+                if (tile.avaliableAction == 'move') {
+                    bt.game.battle.battleField.actions.move(battleService, this.selectedTile.units[bt.model.common.units.definitions.scient][0], tile);
+                } else if (tile.avaliableAction == 'attack') {
+                    bt.game.battle.battleField.actions.attack(battleService, this.selectedTile.units[bt.model.common.units.definitions.scient][0], tile);
+                }
             }
         };
 
