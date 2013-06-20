@@ -56,7 +56,7 @@
     // -----------------------------------------------------------------------------------------------------------------
 
     // Set unit's move radius
-    bt.config.game.battle.actions.moveRadius = 2;
+    bt.config.game.battle.actions.moveRadius = 4;
     // Set if actions and movement can pass through other units
     bt.config.game.battle.actions.jumpUnits = true;
     // Set if player can attack his own units
