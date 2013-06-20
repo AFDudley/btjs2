@@ -67,7 +67,7 @@ bt.model.common = {
         },
 
         ranges : {
-            ranged  : { min : 4, max : 8 },
+            ranged  : { min : 5, max : 8 },
             dot     : { min : 1, max : 1 },
             aoe     : { min : 1, max : Number.MAX_VALUE },
             full    : { min : 1, max : 1 }
