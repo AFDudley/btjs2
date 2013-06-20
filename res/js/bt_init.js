@@ -140,7 +140,7 @@ var bt = {
                     // Actions configuration namespace
                     actions : {
                         // Holds unit's move radius
-                        moveRadius : 1,
+                        moveRadius : 4,
                         // Toggles if actions and movement can pass through other units
                         jumpUnits : true,
                         // Toggles if player can attack his own units
