@@ -10,7 +10,7 @@
 
 bt.config.views.addView('frontpage',    {
                                             id : 'bt.game.frontpage',
-                                            name : 'Frontpage',
+                                            name : 'Login',
                                             url : 'res/partials/views/frontpage.html',
                                             depth : 0,
                                             isPublic : true,

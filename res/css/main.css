@@ -113,47 +113,183 @@ div.toolbox {
     float: right;
 }
 
-    div.toolbox div.player {
+    div.toolbox div.group {
         clear: right;
         float: right;
+        width: 240px;
         margin: 4px 10px 4px 10px;
-        padding: 4px;
-        border: 1px solid #444444;
+        padding: 5px;
 
-        font-size: 13px;
+        background: #999999;
+        color: #eeeeee;
+        border: 1px solid #444444;
+        border-radius: 5px;
+
+        font-size: 11px;
+    }
+        div.toolbox div.group div.header {
+            clear: both;
+            float: left;
+            width: 100%;
+            margin-bottom: 4px;
+
+            border-bottom: 1px solid #eeeeee;
+
+            font-size: 13px;
+            font-weight: bold;
+        }
+            div.toolbox div.group div.header div.title {
+                float: left;
+            }
+        div.toolbox div.group div.header div.data {
+            float: right;
+            color: #444444;
+        }
+        div.toolbox div.group div.header div.comment {
+            float: left;
+            margin: 2px 2px 2px 20px;
+
+            font-size: 9px;
+        }
+
+    div.toolbox div.group div.subgroup {
+        margin-left: 20px;
+    }
+
+    div.toolbox div.player {
     }
 
     div.toolbox div.timers {
-        clear: right;
-        float: right;
-        margin: 4px 10px 4px 10px;
-        padding: 4px;
-        border: 1px solid #444444;
     }
         div.toolbox div.timers div.timer {
-            color: #990000;
-        }
-        div.toolbox div.timers div.action {
-            margin: 4px;
-            color: #0000ff;
+            clear: both;
+            float: right;
+            width: 220px;
+            margin-bottom: 2px;
+
             font-size: 11px;
+        }
+        div.toolbox div.timers div.action_endturn {
+            clear: both;
+            float: left;
+            width: 120px;
+            margin: 4px;
+            padding: 5px;
+
+            border: 1px solid #444444;
+            border-radius: 5px;
+            background: #444444;
+
+            color: #eeeeee;
+            font-size: 13px;
+            text-align: center;
             cursor: pointer;
         }
-        div.toolbox div.timers div.action:hover {
-            font-weight: bold;
+        div.toolbox div.timers div.action_endturn:hover {
+            color: #444444;
+            background: #eeeeee;
             text-decoration: underline;
         }
 
-    div.toolbox div.selected {
-        clear: right;
-        float: right;
-        margin: 4px 10px 4px 10px;
-        padding: 4px;
-        border: 1px solid #444444;
+div.stone {
+    clear: both;
+    float: right;
+    padding: 4px;
+}
+    div.stone div.element {
+        float: left;
+        width: 30px;
+        height: 20px;
+        padding-left: 24px;
     }
+    div.stone div.earth { background: url('../graphics/battle/element_earth.png') top left no-repeat; }
+    div.stone div.fire { background: url('../graphics/battle/element_fire.png') top left no-repeat; }
+    div.stone div.ice { background: url('../graphics/battle/element_ice.png') top left no-repeat; }
+    div.stone div.wind { background: url('../graphics/battle/element_wind.png') top left no-repeat; }
 
+div.stone_small {
+    clear: both;
+    float: right;
+    padding: 4px;
+}
+    div.stone_small div.element {
+        float: left;
+        width: 20px;
+        height: 10px;
+        padding-left: 12px;
 
-div.grid {
+        font-size: 9px;
+    }
+    div.stone_small div.earth { background: url('../graphics/battle/element_small_earth.png') top left no-repeat; }
+    div.stone_small div.fire { background: url('../graphics/battle/element_small_fire.png') top left no-repeat; }
+    div.stone_small div.ice { background: url('../graphics/battle/element_small_ice.png') top left no-repeat; }
+    div.stone_small div.wind { background: url('../graphics/battle/element_small_wind.png') top left no-repeat; }
+
+div.element_Earth { display: inline-block; width: 20px; height: 20px; background: url('../graphics/battle/element_earth.png') top left no-repeat; }
+div.element_Fire { display: inline-block; width: 20px; height: 20px; background: url('../graphics/battle/element_fire.png') top left no-repeat; }
+div.element_Ice { display: inline-block; width: 20px; height: 20px; background: url('../graphics/battle/element_ice.png') top left no-repeat; }
+div.element_Wind { display: inline-block; width: 20px; height: 20px; background: url('../graphics/battle/element_wind.png') top left no-repeat; }
+
+div.element_small_Earth { display: inline-block; width: 10px; height: 10px; background: url('../graphics/battle/element_small_earth.png') top left no-repeat; }
+div.element_small_Fire { display: inline-block; width: 10px; height: 10px; background: url('../graphics/battle/element_small_fire.png') top left no-repeat; }
+div.element_small_Ice { display: inline-block; width: 10px; height: 10px; background: url('../graphics/battle/element_small_ice.png') top left no-repeat; }
+div.element_small_Wind { display: inline-block; width: 10px; height: 10px; background: url('../graphics/battle/element_small_wind.png') top left no-repeat; }
+
+div.unit_stats {
+    clear: both;
+    float: left;
+    padding: 4px;
+}
+
+    div.unit_stats div.hp {
+        font-size: 15px;
+        font-weight: bold;
+    }
+    div.unit_stats div.power {
+        clear: both;
+        float: left;
+        margin: 2px;
+
+        font-size: 11px;
+    }
+        div.unit_stats div.power div {
+            float: left;
+        }
+        div.unit_stats div.power div.type {
+            width: 120px;
+        }
+        div.unit_stats div.power div.stat {
+            width: 30px;
+            height: 20px;
+            padding-left: 24px;
+        }
+        div.unit_stats div.power div.value { background: url('../graphics/battle/stats_value.png') top left no-repeat; }
+        div.unit_stats div.power div.attack { background: url('../graphics/battle/stats_attack.png') top left no-repeat; }
+        div.unit_stats div.power div.defend { background: url('../graphics/battle/stats_defend.png') top left no-repeat; }
+
+    div.unit_stats div.power_small {
+        clear: both;
+        float: left;
+        margin: 1px;
+
+        font-size: 9px;
+    }
+        div.unit_stats div.power_small div {
+            float: left;
+        }
+        div.unit_stats div.power_small div.type {
+            width: 80px;
+        }
+        div.unit_stats div.power_small div.stat {
+            width: 20px;
+            height: 10px;
+            padding-left: 12px;
+        }
+        div.unit_stats div.power_small div.value { background: url('../graphics/battle/stats_small_value.png') top left no-repeat; }
+        div.unit_stats div.power_small div.attack { background: url('../graphics/battle/stats_small_attack.png') top left no-repeat; }
+        div.unit_stats div.power_small div.defend { background: url('../graphics/battle/stats_small_defend.png') top left no-repeat; }
+
+    div.grid {
     float: left;
 }
     div.grid div.grid_row {
@@ -185,18 +321,21 @@ div.grid {
             height: 44px;
         }
 
-    div.grid div.grid_row div.tile_selected {
-        background: url('../graphics/battle/tile_selected.png') top left no-repeat;
-    }
-    div.grid div.grid_row div.tile_move {
-        background: url('../graphics/battle/tile_move.png') top left no-repeat;
-    }
-    div.grid div.grid_row div.tile_range {
-        background: url('../graphics/battle/tile_range.png') top left no-repeat;
-    }
-    div.grid div.grid_row div.tile_attack {
-        background: url('../graphics/battle/tile_attack.png') top left no-repeat;
-    }
+        div.grid div.grid_row div.tile_selected {
+            background: url('../graphics/battle/tile_selected.png') top left no-repeat;
+        }
+        div.grid div.grid_row div.tile_move {
+            background: url('../graphics/battle/tile_move.png') top left no-repeat;
+        }
+        div.grid div.grid_row div.tile_range {
+            background: url('../graphics/battle/tile_range.png') top left no-repeat;
+        }
+        div.grid div.grid_row div.tile_moveInRange {
+            background: url('../graphics/battle/tile_moveInRange.png') top left no-repeat;
+        }
+        div.grid div.grid_row div.tile_attack {
+            background: url('../graphics/battle/tile_attack.png') top left no-repeat;
+        }
 
             div.grid div.grid_row div.tile div.unit {
                 position: relative;
@@ -229,40 +368,17 @@ div.grid {
 
             div.grid div.grid_row div.tile div.info {
                 position: relative;
-                display: none;
                 float: left;
-                left: 48px;
-                top: 48px;
-                padding: 2px;
+                z-index: 1000;
+                width: 0px;
+                height: 0px;
+                overflow: hidden;
 
-                border: 1px solid #444444;
-                background-color: #ffffff;
+                transition: all linear 0.5s ;
             }
             div.grid div.grid_row div.tile:hover div.info {
-                display: block;
-                width: 200px;
+                width: 300px;
+                height: 300px;
+
+                transition-delay: 2s;
             }
-                div.grid div.grid_row div.tile:hover div.info div.header {
-                    clear: both;
-                    float: left;
-                    font-size: 11px;
-                    text-decoration: bold;
-                }
-                div.grid div.grid_row div.tile:hover div.info div.details {
-                    clear: both;
-                    float: left;
-                    margin-top: 8px;
-                    margin-left: 10px;
-                }
-                    div.grid div.grid_row div.tile:hover div.info div.details div.title {
-                        clear: both;
-                        float: left;
-                        font-size: 9px;
-                        margin-bottom: 2px;
-                        text-decoration: underline;
-                    }
-                    div.grid div.grid_row div.tile:hover div.info div.details div.detail {
-                        clear: both;
-                        float: left;
-                        font-size: 9px;
-                    }

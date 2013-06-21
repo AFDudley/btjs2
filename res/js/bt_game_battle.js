@@ -9,7 +9,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 bt.config.views.addView('battle',   {
                                         id : 'bt.game.battle',
-                                        name : 'BATTLE',
+                                        name : 'Battle',
                                         url : 'res/partials/views/battle.html',
                                         depth : 2,
                                         isPublic : false,
@@ -26,11 +26,11 @@ bt.config.views.addView('battle',   {
         Console call syntax example:
     
             bt.services.execute('BattleService', function(service) {
-                                                    service.getUsername(
+                                                    service.calls.getUsername(
                                                                         function(data) { console.log("Success:"); console.log(data); },
                                                                         function(data) { console.log("Fail:"); console.log(data); }
                                                                     );
-                                                });
+                                                }, true);
 */
 bt.services.battleService = app.factory('BattleService', function ($jsonRpc, $interval) {
 
@@ -106,76 +106,84 @@ bt.services.battleService = app.factory('BattleService', function ($jsonRpc, $in
     // Map service unit actions methods
     battleService.actions = {
         // Passes turn to other player
-        pass : function() {
+        pass: function () {
             battleService.calls.processAction(
                 // Parameters
-                [[ 0, 'pass', [] ]],
+                [
+                    [ 0, 'pass', [] ]
+                ],
                 // On successfull load callback
-                function(data) {
+                function (data) {
                     // Fire events
-                    bt.services.battleService.Called.dispatch({ message: 'Response from "BattleService.process_action().', data : data });
-                    bt.services.battleService.BattleFieldAction_Pass.dispatch({ message: 'Response from "BattleService.process_action().', data : data });
+                    bt.services.battleService.Called.dispatch({ message: 'Response from "BattleService.process_action().', data: data });
+                    bt.services.battleService.BattleFieldAction_Pass.dispatch({ message: 'Response from "BattleService.process_action().', data: data });
                     // Refresh timers
                     bt.game.battle.timers.query(battleService);
                 },
                 // On error callback
-                function(data) {
+                function (data) {
                     // Fire events
-                    bt.services.battleService.Error.dispatch({ message: 'Error calling "BattleService.process_action()"!', data : data });
+                    bt.services.battleService.Error.dispatch({ message: 'Error calling "BattleService.process_action()"!', data: data });
+                    // TODO: Remove alert!
+                    alert(data);
                 }
             )
         },
         // Moves unit ( unit object | unit id) to new location ( {x, y} )
-        move : function(unit, targetLocation) {
+        move: function (unit, targetLocation) {
             var unitId = (angular.isNumber(unit) ? unit : unit.id);
             battleService.calls.processAction(
                 // Parameters
-                [[ unitId, 'move', [targetLocation.x, targetLocation.y] ]],
+                [
+                    [ unitId, 'move', [targetLocation.x, targetLocation.y] ]
+                ],
                 // On successfull load callback
-                function(data) {
+                function (data) {
                     // Fire events
-                    bt.services.battleService.Called.dispatch({ message: 'Response from "BattleService.process_action().', data : data });
-                    bt.services.battleService.BattleFieldAction_Move.dispatch({ message: 'Response from "BattleService.process_action().', data : data });
+                    bt.services.battleService.Called.dispatch({ message: 'Response from "BattleService.process_action().', data: data });
+                    bt.services.battleService.BattleFieldAction_Move.dispatch({ message: 'Response from "BattleService.process_action().', data: data });
                     // Refresh timers
                     bt.game.battle.timers.query(battleService);
                     // Process move response
                     bt.game.battle.battleField.actions._processMove(data);
                 },
                 // On error callback
-                function(data) {
+                function (data) {
                     // Fire events
-                    bt.services.battleService.Error.dispatch({ message: 'Error calling "BattleService.process_action()"!', data : data });
+                    bt.services.battleService.Error.dispatch({ message: 'Error calling "BattleService.process_action()"!', data: data });
                     // TODO: Remove alert!
                     alert(data);
                 }
             )
         },
         // Attacks unit ( unit object | unit id) at location ( {x, y} )
-        attack : function(unit, targetLocation) {
+        attack: function (unit, targetLocation) {
             var unitId = (angular.isNumber(unit) ? unit : unit.id);
             battleService.calls.processAction(
                 // Parameters
-                [[ unitId, 'attack', [targetLocation.x, targetLocation.y] ]],
+                [
+                    [ unitId, 'attack', [targetLocation.x, targetLocation.y] ]
+                ],
                 // On successfull load callback
-                function(data) {
+                function (data) {
                     // Fire events
-                    bt.services.battleService.Called.dispatch({ message: 'Response from "BattleService.process_action().', data : data });
-                    bt.services.battleService.BattleFieldAction_Attack.dispatch({ message: 'Response from "BattleService.process_action().', data : data });
+                    bt.services.battleService.Called.dispatch({ message: 'Response from "BattleService.process_action().', data: data });
+                    bt.services.battleService.BattleFieldAction_Attack.dispatch({ message: 'Response from "BattleService.process_action().', data: data });
                     // Refresh timers
                     bt.game.battle.timers.query(battleService);
                     // Process move response
                     bt.game.battle.battleField.actions._processAttack(data);
                 },
                 // On error callback
-                function(data) {
+                function (data) {
                     // Fire events
-                    bt.services.battleService.Error.dispatch({ message: 'Error calling "BattleService.process_action()"!', data : data });
+                    bt.services.battleService.Error.dispatch({ message: 'Error calling "BattleService.process_action()"!', data: data });
                     // TODO: Remove alert!
                     alert(data);
                 }
             )
         }
-    }
+    };
 
     // Return service mapping
     return battleService;
@@ -194,8 +202,12 @@ bt.events.define(bt.services.battleService, 'Error');
 // "Service call successfull" event
 bt.events.define(bt.services.battleService, 'Updated');
 
+// "Battle field play timer reset" event
+bt.events.define(bt.services.battleService, 'BattleField_PlayTimerReset');
 // "Battle field new turn" event
 bt.events.define(bt.services.battleService, 'BattleField_NewTurn');
+// "Battle field new action" event
+bt.events.define(bt.services.battleService, 'BattleField_NewAction');
 
 // "Battle field initialized" event
 bt.events.define(bt.services.battleService, 'BattleFieldInitialized');
@@ -279,7 +291,7 @@ bt.game.battle = {
         // Parses server timer format to milliseconds
         _parseServerTime : function(time) {
             var parsed = time.split(':');
-            return  1000 * ((parseFloat(parsed[0]) * 3600) + (parseFloat(parsed[1]) * 60) + parseFloat(parsed[2]));
+            return  ((parseFloat(parsed[0]) * 3600) + (parseFloat(parsed[1]) * 60) + parseFloat(parsed[2]));
         },
 
         // Updates timers based on last queryed values (calls query if no values)
@@ -291,11 +303,11 @@ bt.game.battle = {
             } else {
                 // Recalculate values
                 var diff = (new Date()) - bt.game.battle.timers._lastQueryTime;
-                var battleTime = (bt.game.battle.timers._battleTime - diff) / 1000;
+                var battleTime = bt.game.battle.timers._battleTime - (diff / 1000);
                 if (battleTime < 0) battleTime = 0;
                 bt.game.battle.timers.battleTime = battleTime;
                 bt.game.battle.timers.battleTimeFormated = Math.floor(battleTime / 3600) + ' : ' + Math.floor((battleTime % 3600) / 60) + ' : ' + Math.floor(battleTime % 60);
-                var playTime = (bt.game.battle.timers._playTime - diff) / 1000;
+                var playTime = bt.game.battle.timers._playTime - (diff / 1000);
                 if (playTime < 0) playTime = 0;
                 bt.game.battle.timers.playTime = playTime;
                 bt.game.battle.timers.playTimeFormated = Math.floor(playTime / 3600) + ' : ' + Math.floor((playTime % 3600) / 60) + ' : ' + Math.floor(playTime % 60);
@@ -319,8 +331,8 @@ bt.game.battle = {
                                                         // Set data
                                                         if ((data) && (data.battle) && (data.ply)) {
                                                             bt.game.battle.timers._battleTime = bt.game.battle.timers._parseServerTime(data.battle);
-                                                            if ((bt.game.battle.timers._parseServerTime(data.ply) > bt.game.battle.timers._playTime) && (bt.game.battle.timers._playTime !== null)) {
-                                                                bt.services.battleService.BattleField_NewTurn.dispatch({ message: 'New turn!', data : data });
+                                                            if ((bt.game.battle.timers._parseServerTime(data.ply) > bt.game.battle.timers.playTime) && (bt.game.battle.timers.playTime !== null)) {
+                                                                bt.services.battleService.BattleField_PlayTimerReset.dispatch({ message: 'Play time reset!', data : data });
                                                             }
                                                             bt.game.battle.timers._playTime = bt.game.battle.timers._parseServerTime(data.ply);
                                                             bt.game.battle.timers._lastQueryTime = new Date();
@@ -418,8 +430,14 @@ bt.game.battle = {
                 if (unit) bt.game.battle.model.battleField.grid.moveContent(unit, { x : data.locs[id][0], y : data.locs[id][1] });
             }
             // Update game status
+            if (data.num) {
+                if (Math.floor(data.num / 2) != bt.game.battle.model.battleField.turnNumber) bt.services.battleService.BattleField_NewTurn.dispatch({ message: 'New turn!', data : data });
+                bt.game.battle.model.battleField.turnNumber = Math.floor(data.num / 2);
+                if ((data.num % 2) + 1 != bt.game.battle.model.battleField.actionNumber) bt.services.battleService.BattleField_NewAction.dispatch({ message: 'New action!', data : data });
+                bt.game.battle.model.battleField.actionNumber = (data.num % 2) + 1;
+                if (data.whose_action) bt.game.battle.model.battleField.activePlayer = bt.game.battle.model.battleField.players[( bt.game.battle.model.battleField.turnNumber % bt.game.battle.model.battleField.players.length )];
+            }
             if (data.game_over) bt.game.battle.model.battleField.gameOver = data.game_over;
-            if (data.whose_action) bt.game.battle.model.battleField.activePlayer = data.whose_action;
 
         }
 
@@ -438,5 +456,4 @@ bt.game.battle.model = {
 
 // TODO: Debugging: Hooked events
 // ---------------------------------------------------------------------------------------------------------------------
-bt.services.battleService.BattleField_NewTurn.subscribe( function(event) { alert("New turn!"); } );
 bt.services.battleService.BattleFieldAction_Attack.subscribe( function(event) {  for (var i in event.data.response.result) alert('Attack does ' + event.data.response.result[i][1] + ' damage!'); } );

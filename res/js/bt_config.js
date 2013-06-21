@@ -45,6 +45,8 @@
     // Selected tile CSS class name
     bt.config.game.battle.styles.range = 'tile_range';
     // Selected tile CSS class name
+    bt.config.game.battle.styles.moveInRange = 'tile_moveInRange';
+    // Selected tile CSS class name
     bt.config.game.battle.styles.attack = 'tile_attack';
 
     // Player's unit CSS class name

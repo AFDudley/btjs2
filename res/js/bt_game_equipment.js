@@ -9,7 +9,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 bt.config.views.addView('equipment',   {
                                             id : 'bt.game.equipment',
-                                            name : 'EQUIPMENT',
+                                            name : 'Assets',
                                             url : 'res/partials/views/equipment.html',
                                             depth : 2,
                                             isPublic : false,

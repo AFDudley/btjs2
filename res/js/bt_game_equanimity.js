@@ -9,7 +9,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 bt.config.views.addView('equanimity',   {
                                             id : 'bt.game.equanimity',
-                                            name : 'EQUANIMITY',
+                                            name : 'World',
                                             url : 'res/partials/views/equanimity.html',
                                             depth : 2,
                                             isPublic : false,

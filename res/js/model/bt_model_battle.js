@@ -309,7 +309,8 @@ bt.model.definitions.battle = {
             if (tile.avaliableAction) {
                 // Execute tile action
                 this._executeActionOnTile(battleService, tile);
-            } else if (tile.isOwnedByPlayer()) {
+            } else {
+                // Select or deselect tile
                 if (tile != this.selectedTile) {
                     // Select tile
                     this._selectTile(tile);
@@ -317,9 +318,6 @@ bt.model.definitions.battle = {
                     // Deselect tile
                     this._selectTile(null);
                 }
-            } else {
-                // Deselect tile
-                this._selectTile(null);
             }
         }
         // Sets tile as selected
@@ -332,7 +330,8 @@ bt.model.definitions.battle = {
             }
             // Set selected tile
             this.selectedTile = tile;
-            if (tile) {
+            if (tile) this.selectedTile.style = bt.config.game.battle.styles.selected;
+            if ((tile) && (tile.isOwnedByPlayer())) {
                 // Calculate weapon attack radius
                 var units = this.selectedTile.units[bt.model.common.units.definitions.scient];
                 if (units.length > 0) {
@@ -356,12 +355,12 @@ bt.model.definitions.battle = {
                                     if  (nearTiles[i].radius <= bt.config.game.battle.actions.moveRadius) {
                                         nearTiles[i].tile.style = bt.config.game.battle.styles.move;
                                         nearTiles[i].tile.avaliableAction = 'move';
-                                    } else if ((nearTiles[i] != this.selectedTile) && (nearTiles[i].radius >= minAttackRadius) && ((nearTiles[i].radius <= maxAttackRadius))) {
-                                        nearTiles[i].tile.style = bt.config.game.battle.styles.range;
+                                    }
+                                    if ((nearTiles[i] != this.selectedTile) && (nearTiles[i].radius >= minAttackRadius) && ((nearTiles[i].radius <= maxAttackRadius))) {
+                                        nearTiles[i].tile.style = (nearTiles[i].tile.style != bt.config.game.battle.styles.move ? bt.config.game.battle.styles.range : bt.config.game.battle.styles.moveInRange);
                                     }
                                 }
                             }
-                            this.selectedTile.style = bt.config.game.battle.styles.selected;
                         }
                     }
                 }
@@ -397,6 +396,8 @@ bt.model.definitions.battle = {
                 this._initializeGrid(obj);
                 // Initialize units
                 this._initializeUnits(obj);
+                // Initialize rest
+                this._initializeOther(obj);
             },
 
             // Initializes battle field's grid from BattleService.init_state() response
@@ -457,10 +458,33 @@ bt.model.definitions.battle = {
                         }
                     }
                 }
+            },
+
+            // Initializes other properties from BattleService.init_state() response
+            _initializeOther : function(obj) {
+                // Verify units
+                if (bt.debugging.model.verifyModelConstructors) {
+                    if ((!angular.isDefined(obj.initial_state)) || (!angular.isDefined(obj.initial_state.player_names))) console.error(obj, 'Initial state definition incomplete: Missing players!');
+                }
+                // Initialize players
+                base.players = obj.initial_state.player_names;
             }
 
         }
         this.initialState.initialize(obj);
+
+        // Game status
+        // ---------------------------------------------------------
+
+        // Holds currently active player's username
+        this.activePlayer = bt.game.authentication.username;
+
+        // Holds current turn number
+        this.turnNumber = 0;
+        // Holds current action number
+        this.actionNumber = 0;
+        // Holds game over status
+        this.gameOver = false;
 
     }
 

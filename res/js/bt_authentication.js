@@ -14,7 +14,7 @@
     
             bt.services.execute('authService', function(service) {
                                                     service.authenticate( 'atkr', 'atkr2', function() { alert("Success"); }, function() { alert("Fail!"); } );
-                                                });
+                                                }, true);
 */
 bt.services.authenticationService = app.factory('AuthenticationService', function ($http) {
         return {
