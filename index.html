@@ -18,8 +18,14 @@
                     <a ng-if=" view.isPublic || bt.game.authentication.isAuthenticated " href="#{{ view._key }}"> {{ view.name }} </a>
                 </div>
             </div>
+
+            <div ng-if=" bt.game.authentication.isAuthenticated == true" style="float: right;">
+                <input class="fast_auth" type="button" value="Authenticate as 'atkr'" ng-click=" services.authenticationService.authenticate('atkr', 'atkr') " />
+                <input class="fast_auth" type="button" value="Authenticate as 'dfndr'" ng-click=" services.authenticationService.authenticate('dfndr', 'dfndr') " />
+            </div>
             <div style="clear: both"></div>
         </div>
+
 
         <div></div>
         
@@ -41,6 +47,7 @@
         <script type="text/javascript" src="res/js/bt_game_equanimity.js"></script>
         <script type="text/javascript" src="res/js/bt_game_battle.js"></script>
         <script type="text/javascript" src="res/js/model/bt_model_battle.js"></script>
+        <script type="text/javascript" src="res/js/ui/bt_ui_battle.js"></script>
         <script type="text/javascript" src="res/js/bt_game_equipment.js"></script>
     </body>
 </html>

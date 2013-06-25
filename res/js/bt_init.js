@@ -46,11 +46,15 @@ var bt = {
             // Reference to main angular module
             app : app,
             // Reference to main controller
-            controller : app.controller('bt.ng.controller', function($scope) {
+            controller : app.controller('bt.ng.controller', function($scope, AuthenticationService) {
                     // Set reference to app namespace
                     $scope.bt = bt;
                     // Set controller name (for scope detection/testing)
                     $scope.controllerName = "bt.ng.controller";
+                    // Set reference to services
+                    $scope.services = {
+                        authenticationService : AuthenticationService
+                    };
                 }).controller
             
         },
@@ -110,7 +114,13 @@ var bt = {
             poling : {
                 
                 // Holds value for minimal time interval between polling same service in [ms]
-                minimalIntervalBetweenPolls : 2000
+                minimalIntervalBetweenPolls : 2000,
+
+                // Battle view namespace
+                battle : {
+                    // Last state refreshing interval
+                    lastStateRefreshInterval : 4000
+                }
                 
             },
 
@@ -134,13 +144,16 @@ var bt = {
                         // Player's unit CSS class name
                         player : 'player',
                         // Enemy unit CSS class name
-                        enemy : 'enemy'
+                        enemy : 'enemy',
+
+                        // Number of animated variations for unit sprite
+                        unitSpriteVariationsCount : 1
                     },
 
                     // Actions configuration namespace
                     actions : {
                         // Holds unit's move radius
-                        moveRadius : 4,
+                        moveRadius : 1,
                         // Toggles if actions and movement can pass through other units
                         jumpUnits : true,
                         // Toggles if player can attack his own units
@@ -223,7 +236,7 @@ var bt = {
                     },
                     // Attach event dispatcher to target
                     dispatch : function(event) {
-                        bt.events.dispatch(this._bt_event_target, this._bt_event_name, event);
+                        return bt.events.dispatch(this._bt_event_target, this._bt_event_name, event);
                     }                    
                 }
             },
@@ -247,13 +260,19 @@ var bt = {
                     console.log(target);
                     console.log(event);
                 }
+                // Initialize event listeners aggregate result
+                var results = { true: 0, false: 0 };
                 // Process event listeners
                 if (target[eventName]._bt_event_subscribed) {
                     for (var i in target[eventName]._bt_event_subscribed) {
                         var fn = target[eventName]._bt_event_subscribed[i];
-                        fn(event, target);
+                        var result = fn(event, target);
+                        if (result === true) results.true++;
+                        if (result === false) results.false++;
                     }
                 }
+                // Return aggregate result
+                return ((results.true > 0) || (results.false > 0) ? results : null);
             }
             
         },

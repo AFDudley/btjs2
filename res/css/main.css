@@ -43,7 +43,6 @@
     .leaveFade                                  { opacity: 1; }
     .leaveFade.leaveFade-active                 { opacity: 0; }
 
-
 /* Generic
  * ---------------------------------------------------------------------------------------------------------------------- */
 
@@ -90,6 +89,26 @@ div.menu {
             padding: 4px;
             border: 2px solid #444444;
         }
+
+    .fast_auth {
+        float: left;
+        margin: 4px;
+        padding: 5px;
+
+        border: 1px solid #444444;
+        border-radius: 5px;
+        background: #444444;
+
+        color: #eeeeee;
+        font-size: 13px;
+        text-align: center;
+        cursor: pointer;
+    }
+    .fast_auth:hover {
+        color: #ffffff;
+        border: 1px solid #ffffff;
+        text-decoration: underline;
+    }
 
 /* Battle view markup (TEMP)
  * ---------------------------------------------------------------------------------------------------------------------- */
@@ -159,6 +178,11 @@ div.toolbox {
     div.toolbox div.player {
     }
 
+    div.toolbox div.log {
+        max-height: 575px;
+        overflow-y: auto;
+    }
+
     div.toolbox div.timers {
     }
         div.toolbox div.timers div.timer {
@@ -186,8 +210,8 @@ div.toolbox {
             cursor: pointer;
         }
         div.toolbox div.timers div.action_endturn:hover {
-            color: #444444;
-            background: #eeeeee;
+            color: #ffffff;
+            border: 1px solid #ffffff;
             text-decoration: underline;
         }
 
@@ -196,6 +220,11 @@ div.stone {
     float: right;
     padding: 4px;
 }
+    div.stone div.comment {
+        float: left;
+        width: 90px;
+        height: 20px;
+    }
     div.stone div.element {
         float: left;
         width: 30px;
@@ -211,14 +240,19 @@ div.stone_small {
     clear: both;
     float: right;
     padding: 4px;
+
+    font-size: 9px;
 }
+    div.stone_small div.comment {
+        float: left;
+        width: 60px;
+        height: 10px;
+    }
     div.stone_small div.element {
         float: left;
         width: 20px;
         height: 10px;
         padding-left: 12px;
-
-        font-size: 9px;
     }
     div.stone_small div.earth { background: url('../graphics/battle/element_small_earth.png') top left no-repeat; }
     div.stone_small div.fire { background: url('../graphics/battle/element_small_fire.png') top left no-repeat; }
@@ -322,7 +356,7 @@ div.unit_stats {
         }
 
         div.grid div.grid_row div.tile_selected {
-            background: url('../graphics/battle/tile_selected.png') top left no-repeat;
+            background: url('../graphics/battle/tile_selected.gif') top left no-repeat;
         }
         div.grid div.grid_row div.tile_move {
             background: url('../graphics/battle/tile_move.png') top left no-repeat;
@@ -337,22 +371,6 @@ div.unit_stats {
             background: url('../graphics/battle/tile_attack.png') top left no-repeat;
         }
 
-            div.grid div.grid_row div.tile div.unit {
-                position: relative;
-                width: 40px;
-                height: 40px;
-                margin: 0px -40px -40px 4px;
-
-                background-position:  center center;
-                background-repeat: no-repeat;
-            }
-                div.grid div.grid_row div.tile div.unit_player {
-                       background-image: url('../graphics/battle/unit_player.gif');
-                }
-                div.grid div.grid_row div.tile div.unit_enemy {
-                    background-image: url('../graphics/battle/unit_enemy.gif');
-                }
-
             div.grid div.grid_row div.tile div.distance {
                 position: relative;
                 width: 44px;
@@ -366,19 +384,159 @@ div.unit_stats {
                 color: #000000;
             }
 
-            div.grid div.grid_row div.tile div.info {
-                position: relative;
-                float: left;
-                z-index: 1000;
-                width: 0px;
-                height: 0px;
-                overflow: hidden;
+    div.grid div.grid_row div.tile div.unit {
+        position: relative;
+        margin: -8px -40px -32px 4px;
+    }
 
-                transition: all linear 0.5s ;
-            }
-            div.grid div.grid_row div.tile:hover div.info {
-                width: 300px;
-                height: 300px;
 
-                transition-delay: 2s;
-            }
+div.graveyard {
+    float: left;
+    width: 100%;
+    margin: 2px 0px 2px 0px;
+
+    border: 1px solid #eeeeee;
+    border-radius: 5px;
+    background: #444444;
+}
+
+    div.graveyard div.title {
+        clear: both;
+        float: left;
+        margin: 5px 10px 5px 20px;
+        border-bottom: 1px solid #eeeeee;
+
+        color: #eeeeee;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+
+div.unit {
+    width: 40px;
+    height: 40px;
+
+    background-position:  center center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+div.unit_player {
+    background-image: url('../graphics/battle/unit_player.png');
+}
+div.unit_player_1 {
+    background-image: url('../graphics/battle/unit_stationary_player_1.gif');
+}
+div.unit_player_2 {
+    background-image: url('../graphics/battle/unit_stationary_player_2.gif');
+}
+div.unit_player_3 {
+    background-image: url('../graphics/battle/unit_stationary_player_3.gif');
+}
+div.unit_player_4 {
+    background-image: url('../graphics/battle/unit_stationary_player_4.gif');
+}
+div.unit_player_5 {
+    background-image: url('../graphics/battle/unit_stationary_player_5.gif');
+}
+div.info_parent:hover div.unit_player,
+div.info_parent:hover div.unit_player_1,
+div.info_parent:hover div.unit_player_2,
+div.info_parent:hover div.unit_player_3,
+div.info_parent:hover div.unit_player_4,
+div.info_parent:hover div.unit_player_5 {
+    background-image: url('../graphics/battle/unit_player.gif');
+}
+div.unit_enemy {
+    background-image: url('../graphics/battle/unit_enemy.png');
+}
+div.unit_enemy_1 {
+    background-image: url('../graphics/battle/unit_stationary_enemy_1.gif');
+}
+div.unit_enemy_2 {
+    background-image: url('../graphics/battle/unit_stationary_enemy_2.gif');
+}
+div.unit_enemy_3 {
+    background-image: url('../graphics/battle/unit_stationary_enemy_3.gif');
+}
+div.unit_enemy_4 {
+    background-image: url('../graphics/battle/unit_stationary_enemy_4.gif');
+}
+div.unit_enemy_5 {
+    background-image: url('../graphics/battle/unit_stationary_enemy_5.gif');
+}
+div.info_parent:hover div.unit_enemy,
+div.info_parent:hover div.unit_enemy_1,
+div.info_parent:hover div.unit_enemy_2,
+div.info_parent:hover div.unit_enemy_3,
+div.info_parent:hover div.unit_enemy_4,
+div.info_parent:hover div.unit_enemy_5 {
+    background-image: url('../graphics/battle/unit_enemy.gif');
+}
+
+    div.unit div.damage {
+        position: relative;
+        top: 0px;
+        left: 0px;
+        width: 44px;
+        height: 30px;
+        padding-top: 14px;
+
+        background: url(../graphics/battle/unit_damage.png) center center no-repeat;
+
+        color: #ffaaaa;
+        font-size: 14px;
+        font-weight: bolder;
+        text-align: center;
+    }
+    div.unit div.damage_true {
+        transition: all linear 2s;
+        opacity: 1;
+    }
+    div.unit div.damage_false {
+        transition: all linear 2s;
+        opacity: 0;
+    }
+
+div.info_parent {
+    float: left;
+}
+
+div.info_parent div.info {
+    position: relative;
+    float: left;
+    z-index: 1000;
+    width: 0px;
+    height: 0px;
+    overflow: hidden;
+
+    transition: all linear 0.5s ;
+}
+div.info_parent:hover div.info {
+    width: 300px;
+    height: 300px;
+
+    transition-delay: 1s;
+}
+div.info_parent div.info_left {
+    margin-left: -240px;
+}
+
+
+div.log_message {
+    clear: both;
+    float: left;
+    width: 210px;
+    padding: 5px;
+
+    font-size: 10px;
+    border-bottom: 1px dotted #444444;
+}
+
+    div.log_message_timer {
+        background: #aaaaff;
+        color: #444444;
+    }
+    div.log_message_combat {
+         background: #ffaaaa;
+         color: #444444;
+     }

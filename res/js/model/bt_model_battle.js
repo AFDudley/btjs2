@@ -119,13 +119,28 @@ bt.model.definitions.battle = {
             this.magic.value = (2 * this.value);
             this.magic.attack = (this.magic.value + this.general.attack + (2 * this.comp[bt.model.common.elements.definitions.I]));
             this.magic.defense = (this.magic.value + this.general.defense + (2 * this.comp[bt.model.common.elements.definitions.W]));
-            this.hp = (4 * (this.physical.defense + this.magic.defense + this.value));
+            this.hp = null;
+            this._damage = { has : false, amount: 0 };
         }
         this.updateStats();
 
-        // Update functionality
+        // Update unit's Hp
         this.updateHp = function(hp) {
-            this.hp = hp;
+            if ((angular.isNumber(hp)) && (hp > 0)) {
+                // Check if damage
+                if ((this.hp === null) || (hp < this.hp)) {
+                    // Anounce damage taken
+                    bt.game.battle.battleField.UnitDamage.dispatch({ unit: this, hp: hp });
+                    // Update Hp
+                    this.hp = hp;
+                }
+            } else if ((hp) || (hp === 0)) {
+                // Anounce unit dead
+                bt.game.battle.battleField.UnitDead.dispatch({ unit: this, hp: hp });
+                // Reset unit's hp
+                this.hp = 0;
+            }
+
         }
     },
 
@@ -168,7 +183,7 @@ bt.model.definitions.battle = {
         }
         // Initialize children
         this._type = bt.model.common.units.definitions.scient;
-        this.style = (this.owner == bt.game.authentication.username ? bt.config.game.battle.styles.player : bt.config.game.battle.styles.enemy);
+        this.style = (this.owner == bt.game.authentication.username ? bt.config.game.battle.styles.player : bt.config.game.battle.styles.enemy) + '_' + Math.ceil(Math.random() * bt.config.game.battle.styles.unitSpriteVariationsCount);
         this.weapon = new bt.model.definitions.battle.weapon(this.weapon);
         if (angular.isDefined(this.weaponBonus)) {
             this.weaponBonus = new bt.model.definitions.battle.stone(this.weaponBonus);
@@ -215,6 +230,21 @@ bt.model.definitions.battle = {
             }
             return false;
             }
+    },
+
+    // Holds dead units for each of the players
+    graveyard : function() {
+        var base = this;
+
+        // Initialize children
+        this.units = { };
+
+        // Adds a unit to graveyard
+        this.addUnit = function(unit) {
+            var player = unit.owner;
+            if (!base.units[player]) base.units[player] = { };
+            base.units[player][unit.id] = unit;
+        }
     },
 
     // Grid definition
@@ -307,16 +337,43 @@ bt.model.definitions.battle = {
         this.processTileClick = function(battleService, tile) {
             // Check if tile is selectable
             if (tile.avaliableAction) {
-                // Execute tile action
-                this._executeActionOnTile(battleService, tile);
+                // Fire 'tile action execute' event
+                var results = bt.game.battle.battleField.TileActionExecute.dispatch(tile);
+                // Check event handlers' results
+                if ((results === null) || (results.false == 0)) {
+                    // Execute tile action
+                    this._executeActionOnTile(battleService, tile);
+                    // Fire 'tile action executed' event
+                    bt.game.battle.battleField.TileActionExecuted.dispatch(tile);
+                }
             } else {
                 // Select or deselect tile
                 if (tile != this.selectedTile) {
-                    // Select tile
-                    this._selectTile(tile);
+
+                    // Check if owned by player
+                    if ((tile.units[bt.model.common.units.definitions.scient].length > 0) && (tile.units[bt.model.common.units.definitions.scient][0].owner == bt.game.authentication.username)) {
+
+                        // Fire 'select tile' event
+                        var results = bt.game.battle.battleField.TileSelect.dispatch(tile);
+                        // Check event handlers' results
+                        if ((results === null) || (results.false == 0)){
+                            // Select tile
+                            this._selectTile(tile);
+                            // Fire 'selected tile' event
+                            bt.game.battle.battleField.TileSelected.dispatch(tile);
+                        }
+                    }
+
                 } else {
-                    // Deselect tile
-                    this._selectTile(null);
+                    // Fire 'deselect tile' event
+                    var results = bt.game.battle.battleField.TileDeselect.dispatch(tile);
+                    // Check event handlers' results
+                    if ((results === null) || (results.false == 0)) {
+                        // Deselect tile
+                        this._selectTile(null);
+                        // Fire 'deselected tile' event
+                        bt.game.battle.battleField.TileDeselected.dispatch(tile);
+                    }
                 }
             }
         }
@@ -369,10 +426,33 @@ bt.model.definitions.battle = {
         // Sets tile as selected
         this._executeActionOnTile = function(battleService, tile) {
             if (tile.avaliableAction) {
-                if (tile.avaliableAction == 'move') {
-                    bt.game.battle.battleField.actions.move(battleService, this.selectedTile.units[bt.model.common.units.definitions.scient][0], tile);
-                } else if (tile.avaliableAction == 'attack') {
-                    bt.game.battle.battleField.actions.attack(battleService, this.selectedTile.units[bt.model.common.units.definitions.scient][0], tile);
+                // Get unit
+                var unit = this.selectedTile.units[bt.model.common.units.definitions.scient][0]
+                if (!unit._pastActions) unit._pastActions = { };
+                if (unit) {
+                    if (tile.avaliableAction == 'move') {
+                        // Check if repeated action in this turn
+                        if ((!unit._pastActions.move) || (unit._pastActions.move < bt.game.battle.model.battleField.turnNumber)) {
+                            // Execute move action
+                            bt.game.battle.battleField.actions.move(battleService, unit, tile);
+                            // Register as executed this turn
+                            unit._pastActions.move = bt.game.battle.model.battleField.turnNumber
+                        } else {
+                            // Fire 'repeated action' event
+                            bt.game.battle.battleField.RepeatAction.dispatch('move');
+                        }
+                    } else if (tile.avaliableAction == 'attack') {
+                        // Check if repeated action in this turn
+                        if ((!unit._pastActions.attack) || (unit._pastActions.attack < bt.game.battle.model.battleField.turnNumber)) {
+                            // Execute move action
+                            bt.game.battle.battleField.actions.attack(battleService, unit, tile);
+                            // Register as executed this turn
+                            unit._pastActions.attack = bt.game.battle.model.battleField.turnNumber
+                        } else {
+                            // Fire 'repeated action' event
+                            bt.game.battle.battleField.RepeatAction.dispatch('attack');
+                        }
+                    }
                 }
             }
         };
@@ -394,10 +474,15 @@ bt.model.definitions.battle = {
             initialize : function(obj) {
                 // Initialize grid
                 this._initializeGrid(obj);
+                // Initialize graveyard
+                this._initializeGraveyard(obj);
                 // Initialize units
                 this._initializeUnits(obj);
                 // Initialize rest
                 this._initializeOther(obj);
+
+                // Initialize event handlers
+                this._initializeEventHandlers();
             },
 
             // Initializes battle field's grid from BattleService.init_state() response
@@ -432,6 +517,12 @@ bt.model.definitions.battle = {
                 }
             },
 
+            // Initializes battle field's graveyard from BattleService.init_state() response
+            _initializeGraveyard : function(obj) {
+                // Initialize graveyard
+                base.graveyard = new bt.model.definitions.battle.graveyard();
+            },
+
             // Initializes battle view's units from BattleService.init_state() response
             _initializeUnits : function(obj) {
                 // Verify units
@@ -452,7 +543,7 @@ bt.model.definitions.battle = {
                             var unit = new bt.model.definitions.battle[unitType](unitDefinition);
                             base.units.addUnit(unit);
 
-                            // Add to grid
+                            // Add to grid or graveyard
                             if (base.grid) base.grid.tilesByX[unit.location.x][unit.location.y].addContent(unit);
 
                         }
@@ -468,6 +559,14 @@ bt.model.definitions.battle = {
                 }
                 // Initialize players
                 base.players = obj.initial_state.player_names;
+            },
+
+            // Initializes event handlers
+            _initializeEventHandlers : function() {
+                // Initiailze 'unit dead' event handler
+                bt.game.battle.battleField.UnitDead.subscribe(function(event) {
+                        base.actions.killUnit(event.unit);
+                    });
             }
 
         }
@@ -486,321 +585,54 @@ bt.model.definitions.battle = {
         // Holds game over status
         this.gameOver = false;
 
+        // Battle field functinoality
+        // ---------------------------------------------------------
+
+        // Battlefield actions namespace
+        this.actions = {
+
+            // Moves unit from grid to graveyard
+            killUnit : function(unit) {
+                // Remove unit from grid
+                if ((base.grid) && (unit.location) && (angular.isNumber(unit.location.x)) && (angular.isNumber(unit.location.y)) && (base.grid.tilesByX[unit.location.x])) {
+                    var tile = base.grid.tilesByX[unit.location.x][unit.location.y];
+                    if (tile) tile.removeContent(unit);
+                }
+                // Add content to graveyard
+                base.graveyard.addUnit(unit);
+            }
+
+        }
+
+
     }
-
-
-/*
-
-    function Battlefield(grid, init_locs, owners) {
-        "use strict";
-        this.grid = new Grid(grid); // from json
-        this.locs = init_locs;
-        this.owners = owners;
-        this.HPs = {};
-        this.units = {};
-        for (var key in this.locs) {
-            var loc = this.locs[key];
-            var unit = this.grid.tiles[loc[0]][loc[1]].contents;
-            if (unit) {
-              this.HPs[key] = unit.hp;
-              this.units[unit.ID] = unit;
-            }
-        }
-        this.graveyard = {};
-        this.dmg_queue = {};
-        this.direction = {
-            0: 'North',
-            1: 'Northeast',
-            2: 'Southeast',
-            3: 'South',
-            4: 'Southwest',
-            5: 'Northwest'
-        };
-        this.ranged = ['Bow', 'Magma', 'Firestorm', 'Forestfire', 'Pyrocumulus'];
-        this.DOT = ['Glove', 'Firestorm', 'Icestorm', 'Blizzard', 'Pyrocumulus'];
-        this.AOE = ['Wand', 'Avalanche', 'Icestorm', 'Blizzard', 'Permafrost'];
-        this.Full = ['Sword', 'Magma', 'Avalanche', 'Forestfire', 'Permafrost'];
-
-        //Grid operations
-        //dumb port
-        this.on_grid = function(tile) {
-            if (0 <= tile[0] && tile[0] < this.grid.x) {
-                if (0 <= tile[1] && tile[1] < this.grid.y) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-        };
-
-        //DUMB port from hex_battlefield.py
-        this.move_scient = function(unitID, dest) {
-            //TODO test me
-            ///move unit from src tile to dest tile
-            var xsrc, ysrc, xdest, ydest = undefined;
-            var src = this.locs[unitID];
-            if (this.on_grid(src)) {
-                xsrc = src[0];
-                ysrc = src[1];
-            } else {
-                throw "Source " + src + " is off grid.";
-            }
-            if (this.on_grid(dest)) {
-                xdest = dest[0];
-                ydest = dest[1];
-            } else {
-                throw "Destination " + dest + " is off grid.";
-            }
-            if (this.grid.tiles[xsrc][ysrc].contents) {
-                if (!this.grid.tiles[xdest][ydest].contents) {
-                    var move = this.grid.tiles[xsrc][ysrc].contents.move;
-                    var range = this.makeRange(src, move);
-                    if (!range.add(dest)) {
-                        this.grid.tiles[xdest][ydest].contents = this.grid.tiles[xsrc][ysrc].contents;
-                        this.locs[unitID] = [xdest, ydest];
-                        this.grid.tiles[xsrc][ysrc].contents = null;
-                        return true;
-                    } else {
-                        throw "tried moving more than " + move + " tiles.";
-                    }
-                } else {
-                    throw "There is already something at " + dest + ".";
-                }
-            } else {
-                throw "There is nothing at " + src + ".";
-            }
-        };
-
-        this.apply_dmg = function(unitID, amount) {
-            var unit = this.units[unitID];
-            if (typeof amount === "number") {
-                unit.hp -= amount;
-            } else if (amount === "Dead.") {
-                unit.hp = 0;
-            }
-            if (unit.hp <= 0) {
-                this.bury(unit);
-            }
-        };
-        this.apply_HPs = function(HPs) {
-            //Applies damage from last_state.
-            for (var ID in HPs) {
-              this.units[ID].hp = HPs[ID];
-            }
-        }
-        this.apply_queued = function() {}; //getting this right will be tricky.
-        this.bury = function(unit) {
-
-            // ensure hp is non negative
-            unit.hp = 0;
-
-            // add to graveyard
-            this.graveyard[unit.ID] = unit;
-
-            // remove from units lookup
-            delete this.units[unit.ID];
-
-            // remove from damage queue
-            //delete this.queued[unit.ID];
-
-            // remove from grid tile
-            this.grid.tiles[unit.location[0]][unit.location[1]].contents = null;
-
-            // clear location?
-            //unit.location = [-1, -1];
-        };
-
-        this.get_adjacent = function(tile, direction) {
-            var direction = typeof direction !== 'undefined' ? direction : 'All';
-            var xpos = tile[0];
-            var ypos = tile[1];
-            var directions = {
-                "East": [
-                    [xpos + 1, ypos], ],
-                "West": [
-                    [xpos - 1, ypos], ]
-            };
-            if (ypos & 1) {
-                directions["North"] = [
-                    [xpos + 1, ypos - 1],
-                    [xpos, ypos - 1]
-                ];
-                directions["South"] = [
-                    [xpos + 1, ypos + 1],
-                    [xpos, ypos + 1]
-                ];
-                directions["Northeast"] = [
-                    [xpos + 1, ypos - 1],
-                    [xpos + 1, ypos]
-                ];
-                directions["Southeast"] = [
-                    [xpos + 1, ypos + 1],
-                    [xpos + 1, ypos]
-                ];
-                directions["Southwest"] = [
-                    [xpos, ypos + 1],
-                    [xpos - 1, ypos]
-                ];
-                directions["Northwest"] = [
-                    [xpos, ypos - 1],
-                    [xpos - 1, ypos]
-                ];
-            } else {
-                directions["North"] = [
-                    [xpos, ypos - 1],
-                    [xpos - 1, ypos - 1]
-                ];
-                directions["South"] = [
-                    [xpos, ypos + 1],
-                    [xpos - 1, ypos + 1]
-                ];
-                directions["Northeast"] = [
-                    [xpos, ypos - 1],
-                    [xpos + 1, ypos]
-                ];
-                directions["Southeast"] = [
-                    [xpos, ypos + 1],
-                    [xpos + 1, ypos]
-                ];
-                directions["Southwest"] = [
-                    [xpos - 1, ypos + 1],
-                    [xpos - 1, ypos]
-                ];
-                directions["Northwest"] = [
-                    [xpos - 1, ypos - 1],
-                    [xpos - 1, ypos]
-                ];
-            }
-            directions["All"] = [];
-            directions["All"] = directions["All"].concat(directions["North"], directions["East"], directions["South"], directions["West"]);
-            var out = new JS.Set();
-            var idx, len;
-            for (idx = 0, len = directions[direction].length; idx < len; idx++) {
-                var loc = directions[direction][idx];
-                if (this.on_grid(loc)) {
-                    out.add(loc);
-                }
-            }
-            return out;
-        };
-        //Nescient operations
-        this.make_parts = function() {};
-        this.make_body = function() {};
-        this.body_on_grid = function() {};
-        this.can_move_nescient = function() {};
-        this.move_nescient = function() {};
-        this.place_nescient = function() {};
-        this.get_rotations = function() {};
-        this.rotate = function() {};
-
-        this.getUnitByLocation = function(location) {
-            for (var u in this.units) {
-                var unit = this.units[u];
-                if (unit) {
-                    if (_.isEqual(location, unit.location)) {
-                        return unit;
-                    }
-                }
-            }
-        }
-
-        // this should be done in GameState.init by computing a reverse lookup
-        this.getUnitIdByLocation = function(location) {
-            for (var id in this.locs) {
-                var loc = this.locs[id];
-                if (loc[0] === location[0] &&
-                    loc[1] === location[1]) {
-                    return id;
-                }
-            }
-        }
-
-        // weapon ops
-        this.make_pattern = function(loc, distance, pointing) {
-            //var tiles = [];
-            var pattern = [];
-            var head = this.get_adjacent(loc, pointing);
-            var cols = 1;
-            while (cols !== distance) {
-                pattern = pattern.concat(head.toArray());
-                var temp_head = head;
-                head = new JS.Set();
-                for (var tloc in temp_head) {
-                    head.add(this.get_adjacent(tloc, pointing));
-                }
-                cols++;
-            }
-            return pattern;
-        };
-
-        this.tilesInRangeOfWeapon = function(loc, weapon) {
-            var weaponHasRange = false;
-            var weaponHasAOE = false;
-            for (var w in this.ranged) {
-                if (this.ranged[w] === weapon.wep_type) {
-                    weaponHasRange = true;
-                    break;
-                }
-            }
-            for (var w2 in this.AOE) {
-                if (this.AOE[w2] === weapon.wep_type) {
-                    weaponHasAOE = true;
-                    break;
-                }
-            }
-            if (weaponHasRange) {
-                var move = 4;
-                var no_hit = this.makeRange(loc, move);
-                var hit = this.makeRange(loc, 2 * move);
-                return hit.difference(no_hit);
-            } else if (weaponHasAOE) {
-                var tiles = [];
-                for (var x = 0; x < this.grid.x; x++) {
-                    for (var y = 0; y < this.grid.y; y++) {
-                        if (x !== loc[0] || y !== loc[1]) {
-                            var pt = [x, y];
-                            tiles.push();
-                        }
-                    }
-                }
-                return tiles;
-            } else {
-                return this.get_adjacent(loc);
-            }
-        };
-
-        this.makeRange = function(location, distance) {
-            var tilesets = [];
-            tilesets.push(this.get_adjacent(location));
-            while (tilesets.length < distance) {
-                var tileset = tilesets.slice(-1)[0].entries().sort();
-                var new_tileset = new JS.Set();
-                for (var n in tileset) {
-                    var tile = tileset[n];
-                    new_tileset.merge(this.get_adjacent(tile));
-                }
-                tilesets.push(new_tileset);
-            }
-            var group = new JS.Set();
-            for (var t in tilesets) {
-                group = group.union(tilesets[t].entries().sort());
-            }
-            return group;
-        };
-
-        this.print = function() {
-            for (var key in this.locs) {
-                var loc = this.locs[key];
-                this.HPs[key] = this.grid.tiles[loc[0]][loc[1]].contents.hp;
-            }
-            console.log("userID        Loc Owner HPs");
-            for (var puserID in this.locs) {
-                console.log("\t" + puserID + ": " + this.locs[puserID] + " " + this.owners[puserID] + "\t" + this.HPs[puserID]);        }
-        };
-    }
-
-*/
 
 }
+
+// Battle view's data model events
+// ---------------------------------------------------------------------------------------------------------------------
+
+// @ bt.game.battle.model
+
+// 'Tile selecte' event
+bt.events.define(bt.game.battle.battleField, 'TileSelect');
+// 'Tile selected' event
+bt.events.define(bt.game.battle.battleField, 'TileSelected');
+
+// 'Tile deselecte' event
+bt.events.define(bt.game.battle.battleField, 'TileDeselect');
+// 'Tile deselected' event
+bt.events.define(bt.game.battle.battleField, 'TileDeselected');
+
+// 'Tile action execute' event
+bt.events.define(bt.game.battle.battleField, 'TileActionExecute');
+// 'Tile action executed' event
+bt.events.define(bt.game.battle.battleField, 'TileActionExecuted');
+
+// 'Repeated action' event
+bt.events.define(bt.game.battle.battleField, 'RepeatAction');
+
+// 'Unit damage' event
+bt.events.define(bt.game.battle.battleField, 'UnitDamage');
+// 'Unit dead' event
+bt.events.define(bt.game.battle.battleField, 'UnitDead');

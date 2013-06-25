@@ -3,6 +3,7 @@
     Controller: {{ controllerName }}
     <br/><br/>
 
+    <!-- Battle stats -->
     <div class="toolbox">
 
         <!-- Player information -->
@@ -27,34 +28,109 @@
             <div class="action_endturn" ng-click=" passTurn(); ">End turn</div>
         </div>
 
+        <!-- Graveyards -->
+        <div class="group section graveyards">
+            <div ng-repeat=" (player, units) in bt.game.battle.model.battleField.graveyard.units ">
+
+                <div class="graveyard">
+                    <div class="title">{{ player }}'s graveyard</div>
+                    <div style="clear: both;"></div>
+                    <div ng-repeat=" unit in units ">
+
+                        <div class="info_parent" style="position:relative; float: left; width: 44px; height: 44px;">
+
+                            <div class="unit {{ unit.style }}"></div>
+
+                            <div class="info info_left">
+                                <div class="toolbox">
+                                    <div class="group hover">
+
+                                        <div class="header">
+                                            <div class="title">{{ unit.name }} (<div class="element_small_{{ unit.element }}"></div>)</div>
+                                            <div class="data">{{ unit.id }}</div>
+                                        </div>
+                                        <div class="stone">
+                                            <div class="element earth">{{ unit.comp.Earth }}</div>
+                                            <div class="element fire">{{ unit.comp.Fire }}</div>
+                                            <div class="element ice">{{ unit.comp.Ice }}</div>
+                                            <div class="element wind">{{ unit.comp.Wind }}</div>
+                                        </div>
+
+                                        <div class="subgroup">
+                                            <div class="unit_stats">
+                                                <div class="hp">HP: {{ unit.hp }}</div>
+                                                <div class="power_small">
+                                                    <div class="type">General:</div>
+                                                    <div class="stat value">{{ unit.general.value }}</div>
+                                                    <div class="stat attack">{{ unit.general.attack }}</div>
+                                                    <div class="stat defend">{{ unit.general.defense }}</div>
+                                                </div>
+                                                <div class="power_small">
+                                                    <div class="type">Magic:</div>
+                                                    <div class="stat value">{{ unit.magic.value }}</div>
+                                                    <div class="stat attack">{{ unit.magic.attack }}</div>
+                                                    <div class="stat defend">{{ unit.magic.defense }}</div>
+                                                </div>
+                                                <div class="power_small">
+                                                    <div class="type">Physical:</div>
+                                                    <div class="stat value">{{ unit.physical.value }}</div>
+                                                    <div class="stat attack">{{ unit.physical.attack }}</div>
+                                                    <div class="stat defend">{{ unit.physical.defense }}</div>
+                                                </div>
+                                            </div>
+
+                                            <div style="clear: both; float: left; margin-top: 6px;">Weapon: {{ unit.weapon._type }} (<div class="element_small_{{ unit.weapon._dStone.element }}"></div>)</div>
+                                            <div class="stone_small">
+                                                <div class="comment">Stats:</div>
+                                                <div class="element earth">{{ unit.weapon._dStone.comp.Earth }}</div>
+                                                <div class="element fire">{{ unit.weapon._dStone.comp.Fire }}</div>
+                                                <div class="element ice">{{ unit.weapon._dStone.comp.Ice }}</div>
+                                                <div class="element wind">{{ unit.weapon._dStone.comp.Wind }}</div>
+                                            </div>
+                                            <div class="stone_small">
+                                                <div class="comment">Bonus:</div>
+                                                <div class="element earth">{{ unit.weaponBonus.comp.Earth }}</div>
+                                                <div class="element fire">{{ unit.weaponBonus.comp.Fire }}</div>
+                                                <div class="element ice">{{ unit.weaponBonus.comp.Ice }}</div>
+                                                <div class="element wind">{{ unit.weaponBonus.comp.Wind }}</div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
         <!-- Selected field information -->
         <div ng-if=" bt.game.battle.model.battleField.grid.selectedTile ">
             <div class="group selected">
 
-                <div class="header">
-                    <div class="title">Selected Tile</div>
-                    <div class="data">{{ bt.game.battle.model.battleField.grid.selectedTile.location.x }}x{{ bt.game.battle.model.battleField.grid.selectedTile.location.y }}</div>
-
-                    <div class="stone">
-                        <div class="element earth">{{ bt.game.battle.model.battleField.grid.selectedTile.comp.Earth }}</div>
-                        <div class="element fire">{{ bt.game.battle.model.battleField.grid.selectedTile.comp.Fire }}</div>
-                        <div class="element ice">{{ bt.game.battle.model.battleField.grid.selectedTile.comp.Ice }}</div>
-                        <div class="element wind">{{ bt.game.battle.model.battleField.grid.selectedTile.comp.Wind }}</div>
-                    </div>
-                </div>
-
                 <!-- Selected field's units -->
-                <div class="subgroup">
-                    <div ng-repeat=" unit in bt.game.battle.model.battleField.grid.selectedTile.contents ">
+                <div ng-repeat=" unit in bt.game.battle.model.battleField.grid.selectedTile.contents ">
 
-                        <div>{{ unit.name }} (<div class="element_small_{{ unit.element }}"></div>), {{ unit.id }}</div>
-                        <div class="stone_small">
-                            <div class="element earth">{{ unit.comp.Earth }}</div>
-                            <div class="element fire">{{ unit.comp.Fire }}</div>
-                            <div class="element ice">{{ unit.comp.Ice }}</div>
-                            <div class="element wind">{{ unit.comp.Wind }}</div>
-                        </div>
+                    <div class="header">
+                        <div class="title">{{ unit.name }} (<div class="element_small_{{ unit.element }}"></div>)</div>
+                        <div class="data">{{ unit.id }}</div>
+                    </div>
+                    <div class="stone">
+                        <div class="element earth">{{ unit.comp.Earth }}</div>
+                        <div class="element fire">{{ unit.comp.Fire }}</div>
+                        <div class="element ice">{{ unit.comp.Ice }}</div>
+                        <div class="element wind">{{ unit.comp.Wind }}</div>
+                    </div>
 
+                    <div class="subgroup">
                         <div class="unit_stats">
                             <div class="hp">HP: {{ unit.hp }}</div>
                             <div class="power_small">
@@ -79,12 +155,14 @@
 
                         <div style="clear: both; float: left; margin-top: 6px;">Weapon: {{ unit.weapon._type }} (<div class="element_small_{{ unit.weapon._dStone.element }}"></div>)</div>
                         <div class="stone_small">
+                            <div class="comment">Stats:</div>
                             <div class="element earth">{{ unit.weapon._dStone.comp.Earth }}</div>
                             <div class="element fire">{{ unit.weapon._dStone.comp.Fire }}</div>
                             <div class="element ice">{{ unit.weapon._dStone.comp.Ice }}</div>
                             <div class="element wind">{{ unit.weapon._dStone.comp.Wind }}</div>
                         </div>
                         <div class="stone_small">
+                            <div class="comment">Bonus:</div>
                             <div class="element earth">{{ unit.weaponBonus.comp.Earth }}</div>
                             <div class="element fire">{{ unit.weaponBonus.comp.Fire }}</div>
                             <div class="element ice">{{ unit.weaponBonus.comp.Ice }}</div>
@@ -94,9 +172,36 @@
                     </div>
                 </div>
 
+                <div class="subgroup">
+                    <div style="clear: both; float: left; margin-top: 6px;">Selected tile:</div>
+
+                    <div class="stone_small">
+                        <div class="element earth">{{ bt.game.battle.model.battleField.grid.selectedTile.comp.Earth }}</div>
+                        <div class="element fire">{{ bt.game.battle.model.battleField.grid.selectedTile.comp.Fire }}</div>
+                        <div class="element ice">{{ bt.game.battle.model.battleField.grid.selectedTile.comp.Ice }}</div>
+                        <div class="element wind">{{ bt.game.battle.model.battleField.grid.selectedTile.comp.Wind }}</div>
+                    </div>
+                </div>
+
+
             </div>
         </div>
 
+    </div>
+
+    <!-- Battle log -->
+    <div class="toolbox">
+        <div class="group log">
+            <div class="header">
+                <div class="title">Battle log:</div>
+            </div>
+
+            <div ng-repeat=" message in bt.game.battle.ui.log.messages ">
+                <div class="log_message log_message_{{ message.style }}">
+                    {{ message.time }}: <b>{{ message.message }}</b>
+                </div>
+            </div>
+        </div>
     </div>
 
     <p>
@@ -104,11 +209,15 @@
         <!-- Battle field -->
         <div class="grid">
             <div class="grid_row" ng-repeat=" tileRow in bt.game.battle.model.battleField.grid.tilesByY ">
-                <div class="tile" ng-repeat=" tile in tileRow " ng-click=" processAction(tile) ">
+                <div class="tile info_parent" ng-repeat=" tile in tileRow " ng-click=" processAction(tile) ">
                     <div class="tile_style {{ tile.style }}">
 
                         <div ng-if=" tile.units['scient'].length ">
-                            <div class="unit {{ tile.units['scient'][0].style }}"></div>
+                            <div class="unit {{ tile.units['scient'][0].style }}">
+                                <div ng-if=" tile.units['scient'][0]._damage.has ">
+                                    <div class="damage damage_{{ tile.units['scient'][0]._damage.has }}">-{{ tile.units['scient'][0]._damage.amount }}</div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="distance">
@@ -122,30 +231,21 @@
 
                             <div class="group hover">
 
-                                <div class="header">
-                                    <div class="title">Tile</div>
-                                    <div class="data">{{ tile.location.x }}x{{ tile.location.y }}</div>
-
-                                    <div class="stone">
-                                        <div class="element earth">{{ tile.comp.Earth }}</div>
-                                        <div class="element fire">{{ tile.comp.Fire }}</div>
-                                        <div class="element ice">{{ tile.comp.Ice }}</div>
-                                        <div class="element wind">{{ tile.comp.Wind }}</div>
-                                    </div>
-                                </div>
-
                                 <!-- Selected field's units -->
-                                <div class="subgroup">
-                                    <div ng-repeat=" unit in tile.contents ">
+                                <div ng-repeat=" unit in tile.contents ">
 
-                                        <div>{{ unit.name }} (<div class="element_small_{{ unit.element }}"></div>), {{ unit.id }}</div>
-                                        <div class="stone_small">
-                                            <div class="element earth">{{ unit.comp.Earth }}</div>
-                                            <div class="element fire">{{ unit.comp.Fire }}</div>
-                                            <div class="element ice">{{ unit.comp.Ice }}</div>
-                                            <div class="element wind">{{ unit.comp.Wind }}</div>
-                                        </div>
+                                    <div class="header">
+                                        <div class="title">{{ unit.name }} (<div class="element_small_{{ unit.element }}"></div>)</div>
+                                        <div class="data">{{ unit.id }}</div>
+                                    </div>
+                                    <div class="stone">
+                                        <div class="element earth">{{ unit.comp.Earth }}</div>
+                                        <div class="element fire">{{ unit.comp.Fire }}</div>
+                                        <div class="element ice">{{ unit.comp.Ice }}</div>
+                                        <div class="element wind">{{ unit.comp.Wind }}</div>
+                                    </div>
 
+                                    <div class="subgroup">
                                         <div class="unit_stats">
                                             <div class="hp">HP: {{ unit.hp }}</div>
                                             <div class="power_small">
@@ -170,18 +270,31 @@
 
                                         <div style="clear: both; float: left; margin-top: 6px;">Weapon: {{ unit.weapon._type }} (<div class="element_small_{{ unit.weapon._dStone.element }}"></div>)</div>
                                         <div class="stone_small">
+                                            <div class="comment">Stats:</div>
                                             <div class="element earth">{{ unit.weapon._dStone.comp.Earth }}</div>
                                             <div class="element fire">{{ unit.weapon._dStone.comp.Fire }}</div>
                                             <div class="element ice">{{ unit.weapon._dStone.comp.Ice }}</div>
                                             <div class="element wind">{{ unit.weapon._dStone.comp.Wind }}</div>
                                         </div>
                                         <div class="stone_small">
+                                            <div class="comment">Bonus:</div>
                                             <div class="element earth">{{ unit.weaponBonus.comp.Earth }}</div>
                                             <div class="element fire">{{ unit.weaponBonus.comp.Fire }}</div>
                                             <div class="element ice">{{ unit.weaponBonus.comp.Ice }}</div>
                                             <div class="element wind">{{ unit.weaponBonus.comp.Wind }}</div>
                                         </div>
 
+                                    </div>
+                                </div>
+
+                                <div class="subgroup">
+                                    <div style="clear: both; float: left; margin-top: 6px;">Tile:</div>
+
+                                    <div class="stone_small">
+                                        <div class="element earth">{{ tile.comp.Earth }}</div>
+                                        <div class="element fire">{{ tile.comp.Fire }}</div>
+                                        <div class="element ice">{{ tile.comp.Ice }}</div>
+                                        <div class="element wind">{{ tile.comp.Wind }}</div>
                                     </div>
                                 </div>
 

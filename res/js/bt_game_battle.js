@@ -62,7 +62,7 @@ bt.services.battleService = app.factory('BattleService', function ($jsonRpc, $in
         monitorTimeLeft : function() {
             $interval.set('battleService.timers.update', function() { bt.game.battle.timers.update(battleService); }, 1000);
             $interval.start('battleService.timers.update');
-            $interval.set('battleService.states.lastState', function() { bt.game.battle.battleField.update(battleService); }, 4000);
+            $interval.set('battleService.states.lastState', function() { bt.game.battle.battleField.update(battleService); }, bt.config.poling.battle.lastStateRefreshInterval);
             $interval.start('battleService.states.lastState');
         },
         // Stops continuous monitoring of service
@@ -208,6 +208,8 @@ bt.events.define(bt.services.battleService, 'BattleField_PlayTimerReset');
 bt.events.define(bt.services.battleService, 'BattleField_NewTurn');
 // "Battle field new action" event
 bt.events.define(bt.services.battleService, 'BattleField_NewAction');
+// "Battle field game over" event
+bt.events.define(bt.services.battleService, 'BattleField_GameOver');
 
 // "Battle field initialized" event
 bt.events.define(bt.services.battleService, 'BattleFieldInitialized');
@@ -239,7 +241,7 @@ bt.game.battle = {
                 };
                 // Set battle field actions
                 $scope.processAction =  function(tile) { bt.game.battle.model.battleField.grid.processTileClick (BattleService, tile); };
-                $scope.passTurn =  function() { BattleService.actions.pass(); };
+                $scope.passTurn =  function() { bt.game.battle.battleField.actions.pass(BattleService); };
             }).controller
         
     },
@@ -364,7 +366,15 @@ bt.game.battle = {
         actions : {
             // Performs pass action
             pass : function(battleService) {
-                battleService.actions.pass();
+                // Fire 'pass turn' event
+                var results = bt.game.battle.battleField.PassTurn.dispatch();
+                // Check event handlers' results
+                if ((results === null) || (results.false == 0)) {
+                    // Execute turn pass
+                    battleService.actions.pass();
+                    // Fire 'passed turn' event
+                    bt.game.battle.battleField.PassedTurn.dispatch();
+                }
             },
 
             // Performs move action
@@ -377,7 +387,12 @@ bt.game.battle = {
                 for (var i in units) {
                     var unit = bt.game.battle.model.battleField.units.unitsById[units[i][0]];
                     var location = units[i][1];
-                    if (unit) bt.game.battle.model.battleField.grid.moveContent(unit, { x : location[0], y : location[1] });
+                    if (unit) {
+                        // Move unit
+                        bt.game.battle.model.battleField.grid.moveContent(unit, { x : location[0], y : location[1] });
+                        // Select unit
+                        bt.game.battle.model.battleField.grid._selectTile(bt.game.battle.model.battleField.grid.tilesByX[location[0]][location[1]]);
+                    }
                 }
             },
 
@@ -419,31 +434,56 @@ bt.game.battle = {
                                             );
         },
         _processUpdate : function(data) {
-            // Update HP
-            if (data.HPs) for (var id in data.HPs) {
-                var unit = bt.game.battle.model.battleField.units.unitsById[id];
-                if (unit) unit.updateHp(data.HPs[id]);
-            }
             // Update location
             if (data.locs) for (var id in data.locs) {
                 var unit = bt.game.battle.model.battleField.units.unitsById[id];
                 if (unit) bt.game.battle.model.battleField.grid.moveContent(unit, { x : data.locs[id][0], y : data.locs[id][1] });
             }
+            // Update HP
+            if (data.HPs) for (var id in bt.game.battle.model.battleField.units.unitsById) {
+                // Get unit
+                var unit = bt.game.battle.model.battleField.units.unitsById[id];
+                // Check if unit updated
+                if (data.HPs[id]) {
+                    // Check damage
+                    if (unit) unit.updateHp(data.HPs[id]);
+                } else {
+                    // Unit dead
+                    if (unit) unit.updateHp(0);
+                }
+            }
             // Update game status
             if (data.num) {
-                if (Math.floor(data.num / 2) != bt.game.battle.model.battleField.turnNumber) bt.services.battleService.BattleField_NewTurn.dispatch({ message: 'New turn!', data : data });
-                bt.game.battle.model.battleField.turnNumber = Math.floor(data.num / 2);
-                if ((data.num % 2) + 1 != bt.game.battle.model.battleField.actionNumber) bt.services.battleService.BattleField_NewAction.dispatch({ message: 'New action!', data : data });
-                bt.game.battle.model.battleField.actionNumber = (data.num % 2) + 1;
-                if (data.whose_action) bt.game.battle.model.battleField.activePlayer = bt.game.battle.model.battleField.players[( bt.game.battle.model.battleField.turnNumber % bt.game.battle.model.battleField.players.length )];
+                if (Math.floor(data.num / 2) != bt.game.battle.model.battleField.turnNumber) {
+                    bt.game.battle.model.battleField.turnNumber = Math.floor(data.num / 2);
+                    if (data.whose_action) bt.game.battle.model.battleField.activePlayer = bt.game.battle.model.battleField.players[( bt.game.battle.model.battleField.turnNumber % bt.game.battle.model.battleField.players.length )];
+                    bt.services.battleService.BattleField_NewTurn.dispatch({ message: 'New turn!', data : data });
+                }
+                if ((data.num % 2) + 1 != bt.game.battle.model.battleField.actionNumber) {
+                    bt.game.battle.model.battleField.actionNumber = (data.num % 2) + 1;
+                    bt.services.battleService.BattleField_NewAction.dispatch({ message: 'New action!', data : data });
+                }
             }
-            if (data.game_over) bt.game.battle.model.battleField.gameOver = data.game_over;
+            // Check if game over
+            if (data.game_over === true) {
+                // Set game over status
+                bt.game.battle.model.battleField.gameOver = data.game_over;
+                // Announce game over
+                bt.services.battleService.BattleField_GameOver.dispatch({ message: 'Game over!', data : data });
+                // Reload view
+                if (bt.config.views._currentView.name == 'Battle') {
+                    // Reload battle field
+                    bt.config.views._currentView.onUnload();
+                    bt.config.views._currentView.onLoad();
+                }
+            }
 
         }
 
     }
 
 }
+
 
 // Initialize 'battle view' model-view
 // ---------------------------------------------------------------------------------------------------------------------
@@ -454,6 +494,27 @@ bt.game.battle.model = {
 
 }
 
-// TODO: Debugging: Hooked events
+
+// Custom events definitions
 // ---------------------------------------------------------------------------------------------------------------------
-bt.services.battleService.BattleFieldAction_Attack.subscribe( function(event) {  for (var i in event.data.response.result) alert('Attack does ' + event.data.response.result[i][1] + ' damage!'); } );
+
+// @ bt.game.battle.model.battleField
+
+// "Pass turn" event
+bt.events.define(bt.game.battle.battleField, 'PassTurn');
+// "Passed turn" event
+bt.events.define(bt.game.battle.battleField, 'PassedTurn');
+
+
+// DEBUGGING: TODO Remove debugging functinoality
+// ---------------------------------------------------------------------------------------------------------------------
+
+// Refresh battle field on authentication successfull
+bt.services.authenticationService.AuthenticationSuccessfull.subscribe(function() {
+    // Check if battleview selected
+    if (bt.config.views._currentView.name == 'Battle') {
+        // Reload battle field
+        bt.config.views._currentView.onUnload();
+        bt.config.views._currentView.onLoad();
+    }
+});

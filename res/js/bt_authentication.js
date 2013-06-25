@@ -48,7 +48,7 @@ bt.services.authenticationService = app.factory('AuthenticationService', functio
                         // Execute callback
                         if (onSuccess) onSuccess(data, status, headers(), config);
                         // Fire event
-                        bt.services.authenticationService.authenticationSuccessfull.dispatch( 'Authentication successfull.' );
+                        bt.services.authenticationService.AuthenticationSuccessfull.dispatch( 'Authentication successfull.' );
                     } else {
                         // De-Authenticate
                         bt.game.authentication.isAuthenticated = false;
@@ -56,7 +56,7 @@ bt.services.authenticationService = app.factory('AuthenticationService', functio
                         // Execute callback
                         if (onFail) onFail(data, status, headers(), config);
                         // Fire event
-                        bt.services.authenticationService.authenticationFailed.dispatch( 'Authentication failed.' );
+                        bt.services.authenticationService.AuthenticationFailed.dispatch( 'Authentication failed.' );
                     }
                     // Set authenticating status
                     bt.game.authentication.login._isAuthenticating = false;
@@ -70,7 +70,7 @@ bt.services.authenticationService = app.factory('AuthenticationService', functio
                     if (onError) onError(data, status, headers(), config);
                     if (onFail) onFail(data, status, headers(), config);
                     // Fire event
-                    bt.services.authenticationService.authenticationError.dispatch( 'Authentication error!' );
+                    bt.services.authenticationService.AuthenticationError.dispatch( 'Authentication error!' );
                     // Set authenticating status
                     bt.game.authentication.login._isAuthenticating = false;
                     
@@ -89,11 +89,11 @@ bt.services.authenticationService = app.factory('AuthenticationService', functio
 // @ bt.services.authService
 
 // "Authentication successfull" event
-bt.events.define(bt.services.authenticationService, 'authenticationSuccessfull');
+bt.events.define(bt.services.authenticationService, 'AuthenticationSuccessfull');
 // "Authentication failed" event (Fired when server invalidates authentication)
-bt.events.define(bt.services.authenticationService, 'authenticationFailed');
+bt.events.define(bt.services.authenticationService, 'AuthenticationFailed');
 // "Authentication error" event (Fired on authentication request error)
-bt.events.define(bt.services.authenticationService, 'authenticationError');
+bt.events.define(bt.services.authenticationService, 'AuthenticationError');
 
 
 // Initialize common game functionality
