@@ -1,86 +1,5 @@
 # Binary Tactics: Client-Side implementation #2
 
-
-
-
-## Implemented tests:
-
-### Testing BattleService.initial_state() call and conversion into the view-model
-
-First get initial state into the view-model either with selecting the Battle view or from console with:
-```javascript
-    bt.game.battle.model.initialization.initialize();
-```
-
-And then you can inspect the initialized view-model's battleField object with:
-```javascript
-    console.log( bt.game.battle.model.battleField );
-```
-
-
-
-
-## Currently testable service calls - console syntax:
-
-### Authentication service (hooked into view model, will have UI manifestation)
-
-```javascript
-    bt.services.execute('authService', function(service) {
-                                            service.authenticate( 'atkr', 'atkr2', function() { alert("Success"); }, function() { alert("Fail!"); } );
-                                        });
-```
-
-### Battle service (not hooked to view model, will not have UI manifestation)
-
-```javascript
-    bt.services.execute('BattleService', function(service) {
-                                            service.calls.getUsername(
-                                                                function(data) { console.log("Success:"); console.log(data); },
-                                                                function(data) { console.log("Fail:"); console.log(data); }
-                                                            );
-                                        });
-    bt.services.execute('BattleService', function(service) {
-                                            service.calls.timeLeft(
-                                                                function(data) { console.log("Success:"); console.log(data); },
-                                                                function(data) { console.log("Fail:"); console.log(data); }
-                                                            );
-                                        });
-    bt.services.execute('BattleService', function(service) {
-                                            service.calls.initialState(
-                                                                function(data) { console.log("Success:"); console.log(data); },
-                                                                function(data) { console.log("Fail:"); console.log(data); }
-                                                            );
-                                        });
-    bt.services.execute('BattleService', function(service) {
-                                            service.calls.lastResult(
-                                                                function(data) { console.log("Success:"); console.log(data); },
-                                                                function(data) { console.log("Fail:"); console.log(data); }
-                                                            );
-                                        });
-    bt.services.execute('BattleService', function(service) {
-                                            service.calls.getStates(
-                                                                function(data) { console.log("Success:"); console.log(data); },
-                                                                function(data) { console.log("Fail:"); console.log(data); }
-                                                            );
-                                        });
-    bt.services.execute('BattleService', function(service) {
-                                            service.calls.getLastState(
-                                                                function(data) { console.log("Success:"); console.log(data); },
-                                                                function(data) { console.log("Fail:"); console.log(data); }
-                                                            );
-                                        });
-    bt.services.execute('BattleService', function(service) {
-                                            service.calls.processAction(
-                                                                'action type',
-                                                                function(data) { console.log("Success:"); console.log(data); },
-                                                                function(data) { console.log("Fail:"); console.log(data); }
-                                                            );
-                                        });
-```
-
-
-
-
 ## Debugging options
 
 ### Events
@@ -95,3 +14,47 @@ To set if model-view objects check received structure when initializing toggle p
 bt.debugging.model.verifyModelConstructors = true | false
 ```
 
+
+
+
+## Service calls stress testing:
+
+The 'debugging view' allows for stress testing with supported service calls. Select service's method to call, set the interval at witch to call it and you get statistics of successfull, failed and error calls in real time ...
+
+
+
+
+## Service calls syntax from console:
+
+### Reinitialize battle view's view-model:
+```javascript
+    bt.services.execute('BattleService', function(service) { service.initialization.initialize(); });
+```
+
+### Update battle view's view-model:
+```javascript
+    bt.services.execute('BattleService', function(service) { bt.game.battle.battleField.update(service) });
+```
+
+### Update battle view's timers:
+```javascript
+    bt.services.execute('BattleService', function(service) { bt.game.battle.timers.query(service) });
+```
+
+
+### Perform action - Pass turn:
+```javascript
+    bt.services.execute('BattleService', function(service) { service.actions.pass(); });
+```
+
+### Perform action - Move unit:
+```javascript
+    var unitId = 0, location = { x: 0, y: 0}; // Set these variables to appropriate values
+    bt.services.execute('BattleService', function(service) { service.actions.move(unitId, location); });
+```
+
+### Perform action - Attack unit:
+```javascript
+    var unitId = 0, location = { x: 0, y: 0}; // Set these variables to appropriate values
+    bt.services.execute('BattleService', function(service) { service.actions.attack(unitId, location); });
+```

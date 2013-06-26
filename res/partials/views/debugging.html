@@ -1,0 +1,72 @@
+<div class="section debugging_view" ng-controller=" bt.game.debugging.ng.controller ">
+
+    <style>
+        div.debugging_view input[type=button] {
+            padding: 5px;
+
+            border: 1px solid #444444;
+            border-radius: 5px;
+            background: #444444;
+
+            color: #eeeeee;
+            font-size: 13px;
+            text-align: center;
+            cursor: pointer;
+        }
+        div.debugging_view input[type=button]:hover {
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            text-decoration: underline;
+        }
+    </style>
+
+     <h1>Service calls testing:</h1> <br/>
+
+    <div style="float: left;">
+        <a>Test BattleService.</a>
+        <select ng-model=" bt.game.debugging.services.battle.selectedMethod " ng-options="name for (name, method) in bt.game.debugging.services.battle.methods "></select>
+        () method with a call every
+        <input type="text" ng-model=" bt.game.debugging.services.battle.callInterval " />
+        ms.
+    </div>
+
+    <div style="float: right;">
+        <div ng-if=" !bt.game.debugging.services.battle.testing.isRunning ">
+            <input type="button" value="Start" ng-click=" testing.start(); " />
+        </div>
+        <div ng-if=" bt.game.debugging.services.battle.testing.isRunning ">
+            <input type="button" value="Stop" ng-click=" testing.stop(); " />
+        </div>
+    </div>
+    <div style="clear: both;"></div>
+
+    <hr/> <br/><br/>
+
+    <div style="float: left; width: 100%;">
+        <a style="float: left;">Service calls:</a>
+        <input style="float: right;" type="text" readonly ng-model=" bt.game.debugging.services.battle.testing.stats.calls " />
+        <div style="clear: both; width: 100%; border-bottom: 1px dotted #444444;"></div>
+
+        <a style="float: left;">Successfull responses:</a>
+        <input style="float: right;" type="text" readonly ng-model=" bt.game.debugging.services.battle.testing.stats.success " />
+        <div style="clear: both; width: 100%; border-bottom: 1px dotted #444444;"></div>
+
+        <a style="float: left;">Failed responses:</a>
+        <input style="float: right;" type="text" readonly ng-model=" bt.game.debugging.services.battle.testing.stats.fail " />
+        <div style="clear: both; width: 100%; border-bottom: 1px dotted #444444;"></div>
+
+        <a style="float: left;">HTTP error responses:</a>
+        <input style="float: right;" type="text" readonly ng-model=" bt.game.debugging.services.battle.testing.stats.error " />
+        <div style="clear: both; width: 100%; border-bottom: 1px dotted #444444;"></div>
+
+        <a style="float: left;">{{ bt.game.debugging.services.battle.testing.stats.rate }}% success response rate</a>
+        <div style="clear: both;"></div>
+    </div>
+    <div style="clear: both;"></div>
+
+    <div style="float: right;">
+        <input type="button" value="Clear stats" ng-click=" testing.reset(); " />
+    </div>
+    <div style="clear: both;"></div>
+
+</div>

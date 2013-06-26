@@ -94,6 +94,8 @@ bt.services.battleService = app.factory('BattleService', function ($jsonRpc, $in
                                                 function(data) {
                                                     // Fire events
                                                     bt.services.battleService.Error.dispatch({ message: 'Error calling "BattleService.init_state()"!', data : data });
+                                                    // TODO: Remove alert!
+                                                    alert(data);
                                                 }
             );
         },
@@ -477,7 +479,8 @@ bt.game.battle = {
                     bt.config.views._currentView.onLoad();
                 }
             }
-
+            // Refresh battle field's grid's tile selection
+            bt.game.battle.model.battleField.grid._selectTile(bt.game.battle.model.battleField.grid.selectedTile);
         }
 
     }

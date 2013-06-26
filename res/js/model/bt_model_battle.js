@@ -119,7 +119,7 @@ bt.model.definitions.battle = {
             this.magic.value = (2 * this.value);
             this.magic.attack = (this.magic.value + this.general.attack + (2 * this.comp[bt.model.common.elements.definitions.I]));
             this.magic.defense = (this.magic.value + this.general.defense + (2 * this.comp[bt.model.common.elements.definitions.W]));
-            this.hp = null;
+            this.hp = 4 * ((this.physical.defense + this.magic.defense) + this.value);
             this._damage = { has : false, amount: 0 };
         }
         this.updateStats();
@@ -464,6 +464,29 @@ bt.model.definitions.battle = {
         // Set base reference
         var base = this;
 
+        // Game status
+        // ---------------------------------------------------------
+
+        // Holds reference to battle grid
+        this.grid = null;
+        // Holds reference to graveyard
+        this.graveyard = null;
+        // Holds reference to units collection
+        this.units = null;
+
+        // Holds active players
+        this.players = [ ];
+        // Holds currently active player's username
+        this.activePlayer = '';
+
+        // Holds current turn number
+        this.turnNumber = 0;
+        // Holds current action number
+        this.actionNumber = 0;
+        // Holds game over status
+        this.gameOver = false;
+
+
         // Initialization
         // ---------------------------------------------------------
 
@@ -559,6 +582,7 @@ bt.model.definitions.battle = {
                 }
                 // Initialize players
                 base.players = obj.initial_state.player_names;
+                base.activePlayer = base.players[0];
             },
 
             // Initializes event handlers
@@ -572,18 +596,6 @@ bt.model.definitions.battle = {
         }
         this.initialState.initialize(obj);
 
-        // Game status
-        // ---------------------------------------------------------
-
-        // Holds currently active player's username
-        this.activePlayer = bt.game.authentication.username;
-
-        // Holds current turn number
-        this.turnNumber = 0;
-        // Holds current action number
-        this.actionNumber = 0;
-        // Holds game over status
-        this.gameOver = false;
 
         // Battle field functinoality
         // ---------------------------------------------------------

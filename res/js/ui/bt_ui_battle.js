@@ -85,7 +85,7 @@ bt.game.battle.battleField.UnitDamage.subscribe(function(event) {
         // Animate damage
         bt.game.battle.ui.animations.animateDamage(event.unit, event.hp);
         // Push to log
-        bt.game.battle.ui.log.addMessage('combat', 'Unit "' + event.unit.name + '" takes ' + event.hp + ' damage!');
+        bt.game.battle.ui.log.addMessage('combat', 'Unit "' + event.unit.name + '" takes ' + (event.unit.hp - event.hp) + ' damage!');
     }
 });
 // Prompts user on 'unit dead' event
@@ -94,7 +94,7 @@ bt.game.battle.battleField.UnitDead.subscribe(function(event) {
         // Animate damage
         bt.game.battle.ui.animations.animateDamage(event.unit, event.hp);
         // Push to log
-        bt.game.battle.ui.log.addMessage('combat', 'Unit "' + event.unit.name + '" takes ' + event.hp + ' damage and dies!');
+        bt.game.battle.ui.log.addMessage('combat', 'Unit "' + event.unit.name + '" takes ' + (event.unit.hp - event.hp) + ' damage and dies!');
     }
 });
 
@@ -111,11 +111,11 @@ bt.game.battle.ui = {
         // Animates damage on unit
         animateDamage : function(unit, hp) {
             // Initialize damage animation (Using CSS3 class name change transition)
-            unit._damage.amount = (unit.hp - hp);
             unit._animation = {
                 _damage : unit._damage,
                 initDamage : function(unit, amount) {
                     unit._damage.has = false;
+                    unit._damage.amount = amount;
                     setTimeout(this.showDamage, 60, this, unit);
                 },
                 showDamage : function(animation, unit) {
