@@ -457,6 +457,9 @@ bt.game.battle = {
             // Update game status
             if (data.num) {
                 if (Math.floor(data.num / 2) != bt.game.battle.model.battleField.turnNumber) {
+                    // Check if turn number reduced - game over
+                    if (Math.floor(data.num / 2) < bt.game.battle.model.battleField.turnNumber) data.game_over = true;
+                    // Update turn and action number
                     bt.game.battle.model.battleField.turnNumber = Math.floor(data.num / 2);
                     if (data.whose_action) bt.game.battle.model.battleField.activePlayer = bt.game.battle.model.battleField.players[( bt.game.battle.model.battleField.turnNumber % bt.game.battle.model.battleField.players.length )];
                     bt.services.battleService.BattleField_NewTurn.dispatch({ message: 'New turn!', data : data });
@@ -467,17 +470,11 @@ bt.game.battle = {
                 }
             }
             // Check if game over
-            if (data.game_over === true) {
+            if (data.game_over) {
                 // Set game over status
-                bt.game.battle.model.battleField.gameOver = data.game_over;
+                bt.game.battle.model.battleField.gameOver = true;
                 // Announce game over
                 bt.services.battleService.BattleField_GameOver.dispatch({ message: 'Game over!', data : data });
-                // Reload view
-                if (bt.config.views._currentView.name == 'Battle') {
-                    // Reload battle field
-                    bt.config.views._currentView.onUnload();
-                    bt.config.views._currentView.onLoad();
-                }
             }
             // Refresh battle field's grid's tile selection
             bt.game.battle.model.battleField.grid._selectTile(bt.game.battle.model.battleField.grid.selectedTile);

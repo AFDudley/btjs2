@@ -14,15 +14,15 @@ bt.services.battleService.BattleField_NewTurn.subscribe(function() {
     bt.game.battle.model.battleField.grid._selectTile(null);
     // Push to log
     bt.game.battle.ui.log.addMessage('timer', bt.game.battle.model.battleField.activePlayer + '\'s turn!');
+    // Animate dnew turn notification
+    bt.game.battle.ui.animations.animateTurn();
 });
 
 // Handles 'new action' event
 bt.services.battleService.BattleField_NewAction.subscribe(function() { });
 
 // Handles 'game over' event
-bt.services.battleService.BattleField_GameOver.subscribe( function() {
-    alert('Game over! Refresh and re login to start new game ...');
-});
+bt.services.battleService.BattleField_GameOver.subscribe( function() { });
 
 // Validates 'tile select' event
 bt.game.battle.battleField.PassTurn.subscribe(function() {
@@ -120,7 +120,7 @@ bt.game.battle.ui = {
                 },
                 showDamage : function(animation, unit) {
                     unit._damage.has = true;
-                    setTimeout(animation.hideDamage, 5000, this, unit);
+                    setTimeout(animation.hideDamage, bt.config.game.battle.styles.damegeNotificationTimeout, this, unit);
                 },
                 hideDamage : function(animation, unit) {
                     unit._damage.has = false;
@@ -128,7 +128,17 @@ bt.game.battle.ui = {
             }
             // Start animation
             unit._animation.initDamage(unit, (unit.hp - hp));
-        }
+        },
+
+        // Animates new turn notification
+        animateTurn : function() {
+            // Set notification
+            bt.game.battle.ui._newTurnNotification = true;
+            // Hide notification after timeout
+            setTimeout(function() { bt.game.battle.ui._newTurnNotification = false; }, 1000);
+        },
+        // Holds 'new turn' notification status
+        _newTurnNotification : false
 
     },
 

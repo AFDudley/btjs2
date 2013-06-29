@@ -24,7 +24,7 @@
     // Set value for minimal time interval between polling same service in [ms]
     bt.config.poling.minimalIntervalBetweenPolls = 2000;
     // Sets value for battle field's last state refresh interval
-    bt.config.poling.battle.lastStateRefreshInterval = 4000;
+    bt.config.poling.battle.lastStateRefreshInterval = 2000;
 
     // Set debugging options
     // -----------------------------------------------------------------------------------------------------------------
@@ -33,6 +33,10 @@
     bt.debugging.events.publishToConsole = false;
     // Set if model constructors will test received properties
     bt.debugging.model.verifyModelConstructors = true;
+    // Sets quick authentication panel
+    bt.debugging.game.showQuickAuth = true;
+    // Set if model constructors will test received properties
+    bt.debugging.game.battle.showBattleLog = false;
 
 // BattleField configuration namespace
 // ---------------------------------------------------------------------------------------------------------------------
@@ -58,6 +62,8 @@
 
     // Sets number of animated variations for unit sprite
     bt.config.game.battle.styles.unitSpriteVariationsCount = 5;
+    // Sets timeout for damage notification animation
+    bt.config.game.battle.styles.damegeNotificationTimeout = 2000;
 
     // Configure actions
     // -----------------------------------------------------------------------------------------------------------------

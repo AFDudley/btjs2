@@ -113,24 +113,23 @@ div.menu {
 /* Battle view markup (TEMP)
  * ---------------------------------------------------------------------------------------------------------------------- */
 
-div.game_over {
-    position: fixed;
-    width: 100%;
-    height: 40%;
-    margin: 30% 0px 30% 0px;
-
-    opacity: 0.6;
-    background: #444444;
-    border-top: 1px solid #000000;
-    border-bottom: 1px solid #000000;
-
-    font-size: 18px;
-    font-weight: bold;
-}
-
 div.toolbox {
     float: right;
 }
+
+    div.toolbox a.link {
+        float: left;
+        margin-left: 20px;
+
+        color: #444444;
+        font-size: 13px;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    div.toolbox a.link:hover {
+        color: #999999;
+        text-decoration: underline;
+    }
 
     div.toolbox div.group {
         clear: right;
@@ -323,14 +322,50 @@ div.unit_stats {
         div.unit_stats div.power_small div.attack { background: url('../graphics/battle/stats_small_attack.png') top left no-repeat; }
         div.unit_stats div.power_small div.defend { background: url('../graphics/battle/stats_small_defend.png') top left no-repeat; }
 
-    div.grid {
+div.grid {
     float: left;
 }
+
+    div.notifications { }
+
+        div.notifications div.game_over {
+            position: relative;
+            float: left;
+            width: 100%;
+            height: 335px;
+            margin-right: -100%;
+            margin-bottom: -585px;
+            padding-top: 250px;
+
+            opacity: 0.6;
+            background: #444444;
+
+            color: #ffffff;
+            font-size: 36px;
+            font-weight: bold;
+            text-align: center;
+        }
+        div.notifications div.end_turn {
+            position: relative;
+            float: left;
+            width: 50%;
+            height: 85px;
+            margin: 250px -75% -335px 25%;
+
+            opacity: 0.6;
+            background: #999999;
+
+            color: #ffffff;
+            font-size: 36px;
+            font-weight: bold;
+            text-align: center;
+        }
+
     div.grid div.grid_row {
         clear: left;
         float: left;
     }
-    div.grid div.grid_row:nth-child(even) {
+    div.grid div.grid_row:nth-child(odd) {
         margin-left:  23px;
     }
 

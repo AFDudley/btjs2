@@ -19,7 +19,7 @@
                 </div>
             </div>
 
-            <div ng-if=" bt.game.authentication.isAuthenticated == true" style="float: right;">
+            <div ng-if=" bt.debugging.game.showQuickAuth == true" style="float: right;">
                 <input class="fast_auth" type="button" value="Authenticate as 'atkr'" ng-click=" services.authenticationService.authenticate('atkr', 'atkr') " />
                 <input class="fast_auth" type="button" value="Authenticate as 'dfndr'" ng-click=" services.authenticationService.authenticate('dfndr', 'dfndr') " />
             </div>

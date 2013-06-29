@@ -187,18 +187,26 @@
             </div>
         </div>
 
+        <div ng-if=" bt.debugging.game.battle.showBattleLog == false">
+            <a class="link" ng-click=" bt.debugging.game.battle.showBattleLog = true; ">Show battle log</a>
+        </div>
+        <div ng-if=" bt.debugging.game.battle.showBattleLog == true">
+            <a class="link" ng-click=" bt.debugging.game.battle.showBattleLog = false; ">Hide battle log</a>
+        </div>
     </div>
 
     <!-- Battle log -->
-    <div class="toolbox">
-        <div class="group log">
-            <div class="header">
-                <div class="title">Battle log:</div>
-            </div>
+    <div ng-if=" bt.debugging.game.battle.showBattleLog ">
+        <div class="toolbox">
+            <div class="group log">
+                <div class="header">
+                    <div class="title">Battle log:</div>
+                </div>
 
-            <div ng-repeat=" message in bt.game.battle.ui.log.messages ">
-                <div class="log_message log_message_{{ message.style }}">
-                    {{ message.time }}: <b>{{ message.message }}</b>
+                <div ng-repeat=" message in bt.game.battle.ui.log.messages ">
+                    <div class="log_message log_message_{{ message.style }}">
+                        {{ message.time }}: <b>{{ message.message }}</b>
+                    </div>
                 </div>
             </div>
         </div>
@@ -208,6 +216,15 @@
 
         <!-- Battle field -->
         <div class="grid">
+            <div class="notifications">
+                <div ng-if=" bt.game.battle.model.battleField.gameOver ">
+                    <div class="game_over">GAME OVER</div>
+                </div>
+                <div ng-if=" bt.game.battle.ui._newTurnNotification ">
+                    <div class="end_turn">{{ bt.game.battle.model.battleField.activePlayer }}'s turn ...</div>
+                </div>
+            </div>
+
             <div class="grid_row" ng-repeat=" tileRow in bt.game.battle.model.battleField.grid.tilesByY ">
                 <div class="tile info_parent" ng-repeat=" tile in tileRow " ng-click=" processAction(tile) ">
                     <div class="tile_style {{ tile.style }}">

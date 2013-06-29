@@ -147,7 +147,9 @@ var bt = {
                         enemy : 'enemy',
 
                         // Number of animated variations for unit sprite
-                        unitSpriteVariationsCount : 1
+                        unitSpriteVariationsCount : 1,
+                        // Timeout for damage notification animation
+                        damegeNotificationTimeout : 2000
                     },
 
                     // Actions configuration namespace
@@ -290,6 +292,19 @@ var bt = {
             model : {
                 // Toggles if model constructors will test received properties
                 verifyModelConstructors : false
+            },
+
+            // Game namespace
+            game : {
+
+                // Toggles wuick authentication panel
+                showQuickAuth : false,
+
+                // Battle view namepsace
+                battle : {
+                    // Toggles if battle log is shown
+                    showBattleLog : true
+                }
             }
         }
 
